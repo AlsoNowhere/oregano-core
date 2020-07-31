@@ -1,0 +1,22 @@
+{
+    "name": "oregano-core",
+    "version": "1.0.0",
+    "description": "",
+    "main": "./dist/oregano-core.js",
+    "scripts": {
+        "build:js": "rollup --config",
+        "watch:js": "rollup --config --watch"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "@rollup/plugin-node-resolve": "^7.1.1",
+        "dillx": "file:../../Dill/dill-x",
+        "rollup": "^2.3.2",
+        "rollup-plugin-dillx": "../../_Tools/rollup-plugin-dillx",
+        "thyme-core": "../../Thyme/thyme-core",
+        "thyme-x": "../../Thyme/thyme-x",
+        "sage": "file:../../Sage"
+    }
+}
