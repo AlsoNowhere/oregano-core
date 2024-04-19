@@ -1,0 +1,29 @@
+{
+  "name": "oregano-core",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./dist/index.js",
+  "scripts": {
+    "build:js": "rollup --config",
+    "watch:js": "rollup --config --watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "peerDependencies": {
+    "mint": "file:../../Mint"
+  },
+  "dependencies": {
+    "@rollup/plugin-node-resolve": "^13.3.0",
+    "@rollup/plugin-typescript": "^8.5.0",
+    "basil": "file:../../Basil",
+    "chive": "file:../../Chive",
+    "sage": "file:../../Sage",
+    "thyme": "file:../../Thyme",
+    "rollup": "^2.78.1"
+  },
+  "devDependencies": {
+    "tslib": "^2.6.2",
+    "typescript": "^4.8.3"
+  }
+}
