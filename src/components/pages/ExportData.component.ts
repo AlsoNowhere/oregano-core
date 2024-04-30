@@ -1,4 +1,4 @@
-import { MintComponent, component, element } from "mint";
+import { MintComponent, component, div, element } from "mint";
 
 import { styles } from "sage";
 
@@ -27,19 +27,31 @@ export const ExportData = component(
         element("h2", null, "{currentTitle}"),
         element(
           "form",
-          { name: "export-data", class: "form", mRef: "formElementRef" },
-          element<TField>(Field, {
-            type: "textarea",
-            label: "Export data",
-            name: "export-data",
-            "[value]": "currentValue",
-            fieldStyles: styles({
-              height: "300px",
-              "font-size": "1rem",
-              "line-height": "1.1rem",
-              resize: "none",
+          { name: "export-data", class: "form flex", mRef: "formElementRef" },
+          [
+            div(
+              element<TField>(Field, {
+                type: "checkbox",
+                label: "Only items",
+                "[checked]": "onlyItems",
+                "[onInput]": "onChangeOnlyItems",
+              })
+            ),
+
+            element<TField>(Field, {
+              type: "textarea",
+              label: "Export data",
+              name: "export-data",
+              wrapperClasses: "width-full",
+              "[value]": "currentValue",
+              fieldStyles: styles({
+                height: "300px",
+                "font-size": "1rem",
+                "line-height": "1.1rem",
+                resize: "none",
+              }),
             }),
-          })
+          ]
         ),
       ])
     ),

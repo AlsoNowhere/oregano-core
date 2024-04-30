@@ -1,4 +1,4 @@
-import { IStore, Resolver, Store } from "mint";
+import { IStore, Resolver, Store, MintEvent, refresh } from "mint";
 
 import { path, wait } from "sage";
 
@@ -14,9 +14,13 @@ export const exportStore = new Store({
   currentValue: new Resolver<string>(() => {
     const item = getItem(path.get().slice(1));
     if (item === null) return "";
+    if (exportStore.onlyItems) {
+      return JSON.stringify(item.items);
+    }
     return JSON.stringify(item);
   }),
 
+  onlyItems: false,
   formElementRef: null,
 
   oninsert: async () => {
@@ -25,8 +29,16 @@ export const exportStore = new Store({
     const input = form["export-data"];
     input.select();
   },
+
+  onChangeOnlyItems: ((_, element) => {
+    exportStore.onlyItems = element.checked;
+    refresh(exportStore);
+  }) as MintEvent<HTMLInputElement>,
 }) as IStore & {
   currentTitle: string;
   currentValue: string;
+  onlyItems: boolean;
   formElementRef: HTMLFormElement;
+
+  onChangeOnlyItems: () => void;
 };

@@ -1,4 +1,4 @@
-import { IStore, Resolver, Store } from "mint";
+import { IStore, Resolver, Store, refresh } from "mint";
 
 import { path, wait } from "sage";
 
@@ -32,6 +32,22 @@ const flattenData = (() => {
   };
 })();
 
+const loadData = () => {
+  const data = flattenData(graphStore.currentList);
+  const maxY = Math.ceil(data.reduce((a, b) => (b.y > a ? b.y : a), -Infinity));
+  const minY = Math.floor(data.reduce((a, b) => (b.y < a ? b.y : a), Infinity));
+  new Line(graphStore.svgElementRef, data, {
+    xLabelsAreVertical: true,
+    borderColour: "lightgrey",
+    pointColour: "#3d7fe3",
+    lineColour: "#3d7fe3",
+    pointSize: 3,
+    tooltip: true,
+    maxY,
+    minY,
+  });
+};
+
 export const graphStore = new Store({
   currentTitle: new Resolver(() => {
     const item = getItem(path.get().slice(1));
@@ -45,32 +61,25 @@ export const graphStore = new Store({
     return item.items;
   }),
 
+  svgClass: new Resolver(() => {
+    return `visibility: ${graphStore.showGraph ? "visible" : "hidden"};`;
+  }),
+
+  showGraph: false,
   svgElementRef: null,
 
   oninsert: async function () {
-    const that = this as typeof graphStore;
+    graphStore.showGraph = false;
     await wait();
-    const data = flattenData(graphStore.currentList);
-    const maxY = Math.ceil(
-      data.reduce((a, b) => (b.y > a ? b.y : a), -Infinity)
-    );
-    const minY = Math.floor(
-      data.reduce((a, b) => (b.y < a ? b.y : a), Infinity)
-    );
-    new Line(that.svgElementRef, data, {
-      xLabelsAreVertical: true,
-      borderColour: "lightgrey",
-      pointColour: "#3d7fe3",
-      lineColour: "#3d7fe3",
-      pointSize: 3,
-      tooltip: true,
-      maxY,
-      minY,
-    });
+    refresh(graphStore);
+    await wait(1000);
+    graphStore.showGraph = true;
+    refresh(graphStore);
+    loadData();
   },
 }) as IStore & {
   currentTitle: string;
   currentList: Array<Item>;
-
+  showGraph: boolean;
   svgElementRef: SVGElement | null;
 };

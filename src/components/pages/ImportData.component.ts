@@ -1,6 +1,6 @@
 import { MintComponent, component, element } from "mint";
 
-import { styles, wait } from "sage";
+import { styles } from "sage";
 
 import { Field, Button, TField } from "thyme";
 
@@ -11,14 +11,6 @@ import { importStore } from "../../stores/import.store";
 class ImportDataComponent extends MintComponent {
   constructor() {
     super();
-
-    this.oninsert = function () {
-      importStore.importValue = "";
-      (async () => {
-        await wait();
-        this.importFormElement?.["importValue"]?.focus();
-      })();
-    };
 
     importStore.connect(this);
   }

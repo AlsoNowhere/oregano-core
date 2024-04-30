@@ -17,6 +17,7 @@ import { getActionAbles } from "../services/get-actions.service";
 
 import { updateMessage } from "../logic/update-message.logic";
 import { updateHeatmap } from "../logic/heatmap/update-heatmap.logic";
+import { resolveHeatmap } from "../logic/heatmap/resolve-heatmap.logic";
 
 import { appStore } from "./app.store";
 import { manageStore } from "./manage.store";
@@ -33,7 +34,6 @@ import { colours } from "../data/colours.data";
 import { IListData } from "../interfaces/IListData.interface";
 
 import { UndoConfigs } from "../enums/undo-configs.enum";
-import { getHeatmap } from "../logic/heatmap/get-heatmap.logic";
 
 const showOverflow = function () {
   const item = this.listElementRef.children[this.itemIndex];
@@ -182,37 +182,7 @@ export const listStore = new Store({
   }),
 
   oninsert() {
-    const item = listStore.currentItem;
-    // ** If not a heatmap then do nothing.
-    // ** If message is an Array then we can't handle it.
-    if (!item.actions.includes("heatmap") || item.message instanceof Array)
-      return;
-
-    // ** Get todays heatmap.
-    const heat = getHeatmap(item);
-
-    // ** Reset checkboxes on item message.
-    item.message = item.message.replace(/--c-c/g, "--c");
-
-    // ** If there is no recorded heatmap for today then do nothing.
-    if (heat === null) return;
-
-    // ** Define a new empty message.
-    const message = [];
-
-    const eachLine = item.message.split("\n");
-
-    Object.keys(heat).forEach((key) => {
-      eachLine.forEach((x) => {
-        if (x.includes(key)) {
-          message.push(x.replace("--c", "--c-c"));
-        } else {
-          message.push(x);
-        }
-      });
-    });
-
-    item.message = message.join("\n");
+    resolveHeatmap();
   },
 
   changeCheckbox(_, element) {

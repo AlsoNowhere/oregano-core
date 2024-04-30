@@ -5,7 +5,7 @@ export const Message = component("div", null, { class: "list-page__message" }, [
     "div",
     {
       mIf: "!messageIsArray",
-      style: "white-space: pre-wrap; {currentStyles}",
+      style: "white-space: pre-wrap; word-wrap: break-word; {currentStyles}",
     },
     template("renderedMessage")
   ),
