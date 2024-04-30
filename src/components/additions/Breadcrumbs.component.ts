@@ -9,6 +9,11 @@ import { listStore } from "../../stores/list.store";
 
 import { IData } from "../../interfaces/IData.interface";
 
+interface ICrumbs {
+  content: string;
+  isLink: boolean;
+}
+
 class BreadcrumbsComponent extends MintComponent {
   goToLink: () => void;
 
@@ -16,11 +21,19 @@ class BreadcrumbsComponent extends MintComponent {
     super();
 
     getter(this, "crumbs", () => {
-      if (appStore.rootData === null) return [];
+      let output: Array<ICrumbs> = [];
+      if (appStore.rootData === null) return output;
+
       const url = path.get();
+
+      if (url.length === 1) {
+        output = [{ content: " -- root -- ", isLink: false }];
+        return output;
+      }
+
       if (url.length === 1) return [{ content: " ", isLink: false }];
       let data: IData = appStore.rootData;
-      const crumbs = url.reduce((a, b, i) => {
+      const crumbs: Array<ICrumbs> = url.reduce((a, b, i) => {
         if (i === 0) {
           a.push({ content: data.title, isLink: true });
           return a;
@@ -39,8 +52,9 @@ class BreadcrumbsComponent extends MintComponent {
           { content: data.title, isLink: i !== url.length - 1 }
         );
         return a;
-      }, [] as Array<{ content: string; isLink: boolean }>);
-      return crumbs;
+      }, [] as Array<ICrumbs>);
+      output = crumbs;
+      return output;
     });
 
     this.goToLink = function () {

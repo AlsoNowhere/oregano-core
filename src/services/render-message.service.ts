@@ -24,6 +24,8 @@ export const renderMessage = (message: string) => {
       resolved.push(p(" "));
       return;
     }
+    // ** ORDER IS IMPORTANT HERE
+    // ** Speech quotes ""
     {
       const [a, b] = [x.charAt(0), x.substring(x.length - 1)];
       if (a === '"' && b === '"') {
@@ -31,6 +33,18 @@ export const renderMessage = (message: string) => {
         return;
       }
     }
+    // ** Code block --code
+    if (x.includes("--code")) {
+      resolved.push(
+        element(
+          "code",
+          { style: "padding: 0.5rem 1rem;" },
+          x.replace(/(--code\s?)/g, "")
+        )
+      );
+      return;
+    }
+    // ** Checkboxes --c
     if (x.includes("--c")) {
       const start =
         x.indexOf("--c-c") !== -1
@@ -40,10 +54,12 @@ export const renderMessage = (message: string) => {
       resolved.push(getCheckbox(label, x.includes("--c-c")));
       return;
     }
+    // ** Bold text --b
     if (x.includes("--b")) {
       resolved.push(p({ class: "bold" }, x.replace(/(--b\s?)/g, "")));
       return;
     }
+    // ** Bullet point --
     if (x.includes("--")) {
       resolved.push(
         p({ class: "bold line-height" }, [
@@ -59,6 +75,7 @@ export const renderMessage = (message: string) => {
       );
       return;
     }
+    // ** Default
     resolved.push(p({ style: "line-height: 1.2" }, x));
   });
 

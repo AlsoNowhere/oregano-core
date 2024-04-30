@@ -44,7 +44,6 @@ const oninsert = async () => {
     // ** Edit
     const editItem = manageStore.editItem as IRootData;
     if (editItem.root === true) {
-      console.log("Get it: ", manageStore.editItem);
       manageStore.showColours = false;
     }
     manageStore.title = manageStore.editItem.title;

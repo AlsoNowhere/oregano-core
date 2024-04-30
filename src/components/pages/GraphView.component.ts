@@ -1,4 +1,4 @@
-import { MintComponent, component, element } from "mint";
+import { MintComponent, component, div, element } from "mint";
 
 import { AltButtons } from "../additions/AltButtons.component";
 
@@ -28,8 +28,15 @@ export const GraphView = component(
           { class: "other-content__title margin-bottom" },
           "{currentTitle}"
         ),
+        // div(
+        //   {
+        //     mIf: "!showGraph"
+        //   },
+        //   "Loading..."
+        // ),
         element("svg", {
-          class: "",
+          mIf: "showGraph",
+          class: "svgClass",
           viewBox: "0 0 836 420",
           style: "width:836px;height:420px;",
           mRef: "svgElementRef",

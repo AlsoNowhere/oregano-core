@@ -1,4 +1,4 @@
-import { MintComponent, component, element } from "mint";
+import { MintComponent, component, div, element } from "mint";
 
 import { Field, Button, TField } from "thyme";
 
@@ -37,21 +37,36 @@ export const Search = component(
             mRef: "formElementRef",
           },
           [
-            element<TField>(Field, {
-              name: "search",
-              placeholder: "Search ...",
-              wrapperClasses: "flex-grow margin-right-small",
-              "[value]": "value",
-              "[onInput]": "update",
-            }),
+            div({ class: "flex width-full" }, [
+              element<TField>(Field, {
+                name: "search",
+                placeholder: "Search ...",
+                wrapperClasses: "flex-grow margin-right-small",
+                "[value]": "value",
+                "[onInput]": "update",
+              }),
 
-            element(Button, {
-              type: "submit",
-              icon: "search",
-              class: "square",
-            }),
+              element(Button, {
+                type: "submit",
+                icon: "search",
+                class: "square",
+              }),
+            ]),
+
+            div(
+              element<TField>(Field, {
+                type: "checkbox",
+                label: "Include message",
+                name: "include-message",
+                "[checked]": "includeMessage",
+                "[onInput]": "onCheckIncludeMessage",
+                // mRef: "includeMessageRef",
+              })
+            ),
           ]
         ),
+
+        div({ mIf: "showNoItemFound" }, "-- No items found --"),
 
         element(
           "ul",

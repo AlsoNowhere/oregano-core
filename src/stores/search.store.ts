@@ -21,8 +21,10 @@ const runSearch: MintEvent = (event) => {
     return;
   }
   const { items } = getItem(path.get().slice(1));
-  const results = searchItems(items, value);
+  const { includeMessage } = searchStore;
+  const results = searchItems(items, value, { includeMessage });
   searchStore.results = results;
+  searchStore.searchRun = true;
   refresh(appStore);
 };
 
@@ -37,11 +39,17 @@ export const searchStore = new Store({
   value: "",
   results: [],
   formElementRef: null,
+  searchRun: false,
+  includeMessage: false,
 
   currentTitle: new Resolver(() => {
     const item = getItem(path.get().slice(1));
     if (item === null) return "";
     return item.title;
+  }),
+
+  showNoItemFound: new Resolver(() => {
+    return searchStore.searchRun && searchStore.results.length === 0;
   }),
 
   update,
@@ -50,9 +58,14 @@ export const searchStore = new Store({
 
   selectRoute,
 
+  onCheckIncludeMessage(_, element) {
+    searchStore.includeMessage = element.checked;
+  },
+
   oninsert: async function () {
     searchStore.value = "";
     searchStore.results = [];
+    searchStore.searchRun = false;
     await wait();
     searchStore.formElementRef?.search?.focus();
   },
@@ -60,4 +73,6 @@ export const searchStore = new Store({
   value: string;
   results: Array<{}>;
   formElementRef: HTMLFormElement;
+  searchRun: boolean;
+  includeMessage: boolean;
 };
