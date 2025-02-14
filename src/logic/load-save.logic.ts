@@ -1,34 +1,68 @@
 import { appStore } from "../stores/app.store";
 
+import { Undo } from "../models/Undo.model";
+import { Item } from "../models/Item.model";
+
 import { IData } from "../interfaces/IData.interface";
 import { IRootData } from "../interfaces/IRootData.interface";
+import { ISaveData } from "../interfaces/ISaveData.interface";
 
-import { defaultData, sessionStorageKey } from "../data/constants.data";
+import { defaultData } from "../data/constants.data";
 
 const cleanItem = (item: IData | IRootData) => {
   item.items = item.items.filter((x) => !!x);
-  item.items.forEach(cleanItem);
+  item.items = item.items.map(cleanItem);
+  const {
+    title,
+    message,
+    colour,
+    actions,
+    items,
+    heatmap,
+    tags,
+    index,
+    createdAt,
+  } = item;
+  const newItem = new Item({
+    title,
+    message,
+    colour,
+    actions,
+    items,
+    heatmap,
+    tags,
+    index,
+    createdAt,
+  });
+  return newItem;
 };
 
 const cleanData = (item: IRootData) => {
-  item.pasteItems = item.pasteItems.filter((x) => !!x);
   cleanItem(item);
-  return item;
+};
+
+const initRootData = (item: ISaveData) => {
+  const undo = new Undo(item.undo);
+  const output: IRootData = { ...item, undo };
+  cleanData(output);
+  return output;
 };
 
 export const loadData = async () => {
   if (appStore.sessionStorageKey === null) {
-    console.warn("Could not LOAD data, no session storage key provided");
-    // return;
+    console.warn(
+      "Could not LOAD data, no session storage key (appStore.sessionStorageKey) provided"
+    );
+    return;
   }
   const localData = localStorage.getItem(appStore.sessionStorageKey);
   const data =
     !localData || localData === "undefined" ? defaultData : localData;
-  const parsed = JSON.parse(data);
+  const parsed = JSON.parse(data) as ISaveData;
   if (parsed.timestamp_root === undefined) {
     parsed.timestamp_root = Date.now();
   }
-  appStore.rootData = cleanData(parsed);
+  appStore.rootData = initRootData(parsed);
   saveData();
 };
 
@@ -37,6 +71,7 @@ export const saveData = async () => {
     console.warn("Could not SAVE data, no session storage key provided");
     return;
   }
-  const data = appStore.rootData;
+  const data: any = { ...appStore.rootData };
+  data.undo = data.undo.list;
   localStorage.setItem(appStore.sessionStorageKey, JSON.stringify(data));
 };

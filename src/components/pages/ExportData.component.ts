@@ -1,59 +1,61 @@
-import { MintComponent, component, div, element } from "mint";
+import { MintScope, component, div, mRef, node } from "mint";
 
 import { styles } from "sage";
 
 import { Field, TField } from "thyme";
 
-import { AltButtons } from "../additions/AltButtons.component";
-
 import { exportStore } from "../../stores/export.store";
 
 export const ExportData = component(
-  "div",
-  class ExportDataComponent extends MintComponent {
+  "<>",
+  class ExportDataComponent extends MintScope {
     constructor() {
       super();
 
       exportStore.connect(this);
     }
   },
-  { class: "common-page" },
+  null,
   [
-    element(AltButtons),
-    element(
-      "div",
-      { class: "other-content" },
-      element("section", { class: "other-content__container" }, [
-        element("h2", null, "{currentTitle}"),
-        element(
-          "form",
-          { name: "export-data", class: "form flex", mRef: "formElementRef" },
-          [
-            div(
-              element<TField>(Field, {
-                type: "checkbox",
-                label: "Only items",
-                "[checked]": "onlyItems",
-                "[onInput]": "onChangeOnlyItems",
-              })
-            ),
+    node("section", { class: "other-content__container" }, [
+      node(
+        "form",
+        {
+          name: "export-data",
+          class: "form flex",
+          mRef: mRef("formElementRef"),
+        },
+        [
+          node(
+            "h2",
+            { class: "width-full reset-margin margin-bottom-small" },
+            "{currentTitle}"
+          ),
 
-            element<TField>(Field, {
-              type: "textarea",
-              label: "Export data",
-              name: "export-data",
-              wrapperClasses: "width-full",
-              "[value]": "currentValue",
-              fieldStyles: styles({
-                height: "300px",
-                "font-size": "1rem",
-                "line-height": "1.1rem",
-                resize: "none",
-              }),
+          div(
+            node<TField>(Field, {
+              type: "checkbox",
+              label: "Only items",
+              "[checked]": "onlyItems",
+              "[onInput]": "onChangeOnlyItems",
+            })
+          ),
+
+          node<TField>(Field, {
+            type: "textarea",
+            label: "Export data",
+            name: "export-data",
+            wrapperClasses: "width-full",
+            "[value]": "currentValue",
+            fieldStyles: styles({
+              height: "300px",
+              "font-size": "1rem",
+              "line-height": "1.1rem",
+              resize: "none",
             }),
-          ]
-        ),
-      ])
-    ),
+          }),
+        ]
+      ),
+    ]),
   ]
 );

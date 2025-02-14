@@ -1,13 +1,8 @@
-// import _package from "../../package.json";
+import { ISaveData } from "../interfaces/ISaveData.interface";
 
-import { IRootData } from "../interfaces/IRootData.interface";
 import { colours } from "./colours.data";
 
-export const sessionStorageKey = "oregano-v4-key";
-
-// export const version = _package.version;
-
-const data: IRootData = {
+const data: ISaveData = {
   root: true,
   timestamp_root: Date.now(),
   title: "Oregano",
@@ -15,11 +10,11 @@ const data: IRootData = {
   colour: colours[0].colour,
   actions: [],
   items: [],
+  tags: [],
   index: 0,
   createdAt: Date.now(),
-  edits: [],
   pasteItems: [],
-  undoItems: [],
+  undo: [],
   itemIndex: 1,
 };
 

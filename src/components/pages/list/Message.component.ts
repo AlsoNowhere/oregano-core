@@ -1,27 +1,158 @@
-import { component, element, template } from "mint";
+import {
+  component,
+  node,
+  Resolver,
+  MintScope,
+  template,
+  TMintContent,
+  refresh,
+} from "mint";
 
-export const Message = component("div", null, { class: "list-page__message" }, [
-  element(
-    "div",
-    {
-      mIf: "!messageIsArray",
-      style: "white-space: pre-wrap; word-wrap: break-word; {currentStyles}",
-    },
-    template("renderedMessage")
-  ),
+import { Field, TField } from "thyme";
 
-  element(
-    "ul",
-    { mIf: "messageIsArray", class: "flex list" },
-    element(
-      "li",
-      {
-        mFor: "currentMessage",
-        mKey: "_x",
-        class: "padded",
-        style: "white-space: pre-wrap;",
-      },
-      "{_x}"
-    )
-  ),
-]);
+import { path } from "sage";
+
+import { saveData } from "../../../logic/load-save.logic";
+import { checkHeatmapCheckbox } from "../../../logic/heatmap/check-heatmap-checkbox.logic";
+
+import { listStore } from "../../../stores/list.store";
+import { heatmapStore } from "../../../stores/heatmap.store";
+
+import { actionButtons } from "../../../data/action-buttons.data";
+
+import { ActionTypes } from "../../../enums/ActionTypes.enum";
+
+const checkItem = (
+  splits: Array<string>,
+  line: string,
+  index: number,
+  scope: MintScope
+) => {
+  const newSplits = [...splits];
+  newSplits.splice(
+    index,
+    1,
+    line.includes("--c-c")
+      ? line.replace("--c-c", "--c")
+      : line.replace("--c", "--c-c")
+  );
+  if (path.get().at(0) === "list") {
+    listStore.item.message = newSplits.join("\n");
+    if (listStore.item.actions.includes("heatmap")) {
+      checkHeatmapCheckbox(listStore.item);
+    }
+  } else if (path.get().at(0) === "heatmap") {
+    const [d, m, y] = heatmapStore.editingDate.split("-");
+    heatmapStore.message = newSplits.join("\n");
+    checkHeatmapCheckbox(
+      listStore.item,
+      heatmapStore.message,
+      new Date(`${y}/${m}/${d}`)
+    );
+  }
+  saveData();
+  refresh(scope);
+};
+
+const resolveCheckbox = (
+  splits: Array<string>,
+  lineContent: string,
+  index: number,
+  scope: MintScope
+) => {
+  return node<TField>(Field, {
+    type: "checkbox",
+    checked: lineContent.includes("--c-c"),
+    label: lineContent.replace(/--c-c/g, "").replace(/--c/g, ""),
+    onInput: () => checkItem(splits, lineContent, index, scope),
+  });
+};
+
+const getTemplate = (message: string, scope: MintScope) => {
+  const splits = message.split("\n");
+
+  const output = splits.map((x, i) => {
+    let element = "p";
+
+    if (x.includes("--c")) {
+      return resolveCheckbox(splits, x, i, scope);
+    }
+
+    if (x.includes("--<>")) {
+      x = x.replace("--<>", "");
+      element = "code";
+    }
+
+    const classes = ["reset-margin"];
+
+    if (x.includes("--b")) {
+      x = x.replace(/--b/g, "");
+      classes.push("bold");
+    }
+
+    if (x.includes("--u")) {
+      x = x.replace(/--u/g, "");
+      classes.push("underline");
+    }
+
+    if (x.includes("--i")) {
+      x = x.replace(/--i/g, "");
+      classes.push("italic");
+    }
+
+    if (x.includes("--gap")) {
+      x = x.replace(/--gap/g, "");
+      classes.push("margin-top margin-bottom");
+    }
+
+    let content: string | TMintContent = x;
+
+    if (content === "") {
+      content = node("br");
+    }
+
+    return node(element, { class: classes.join(" ") }, content);
+  });
+
+  return output;
+};
+
+class MessageComponent extends MintScope {
+  message: string;
+  class: string;
+  currentStyles: Resolver<string>;
+  messageTemplate: () => TMintContent;
+
+  constructor() {
+    super();
+
+    this.message = "";
+    this.class = "";
+
+    this.currentStyles = new Resolver(() => {
+      const { item } = listStore;
+      let str = "";
+      const actions = item.actions || [];
+      // ** For each action
+      actions.forEach((x) => {
+        // ** Find the action.
+        const action = actionButtons.find((y) => y.id === x);
+        // ** Only check actions that affect styles.
+        if (action.action?.type !== ActionTypes.style) return;
+        str += action.action.value;
+      });
+      return str;
+    });
+
+    this.messageTemplate = function () {
+      return getTemplate(this.message, this);
+    };
+  }
+}
+
+export const Message = component(
+  "div",
+  MessageComponent,
+  { class: "list-page__message {class}" },
+  [node(template({ conditionedBy: "message" }, "messageTemplate"))]
+);

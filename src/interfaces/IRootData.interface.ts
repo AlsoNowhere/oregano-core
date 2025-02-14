@@ -1,14 +1,7 @@
-import { Item } from "../models/Item.model";
-import { UndoConfig } from "../models/UndoConfig.model";
-import { IData } from "./IData.interface";
+import { Undo } from "../models/Undo.model";
 
-export interface IRootData extends IData {
-  root: true;
-  timestamp_root: number;
-  title: string;
-  message: string;
-  items: [];
-  pasteItems: Array<Item>;
-  undoItems: Array<UndoConfig>;
-  itemIndex: number;
+import { ICommonRootData } from "./ICommonRootData.interface";
+
+export interface IRootData extends ICommonRootData {
+  undo: Undo;
 }

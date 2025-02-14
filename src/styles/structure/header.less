@@ -1,10 +1,12 @@
 .header {
-  position: fixed;
-  z-index: 1;
-  .pinned;
+  // position: fixed;
+  position: relative;
+  z-index: 2;
+  // .pinned;
   .flex;
   .space-between;
   width: 100%;
+  height: @sizeLarge;
   .blueberry-bg;
   .shadow;
   -webkit-app-region: drag;
@@ -13,14 +15,19 @@
     .no-margin;
     .padded-medium;
     .snow-text;
-    line-height: 3rem;
+    line-height: @sizeLarge;
+    font-size: 1.5em;
+
+    span + span {
+      font-size: 0.6em;
+    }
   }
 
   button {
     position: relative;
     z-index: 1;
-    width: 3rem;
-    height: 3rem;
+    width: @sizeLarge;
+    height: @sizeLarge;
     -webkit-app-region: no-drag;
 
     span {

@@ -1,8 +1,8 @@
-import { MintComponent, component, element, getter, refresh } from "mint";
+import { MintScope, Resolver, component, node, mFor, mIf, refresh } from "mint";
 
 import { path, toast, wait } from "sage";
 
-import { upToRoot } from "../../services/up-to-root.service";
+import { upLevel } from "../../logic/main-buttons/up-level.logic";
 
 import { appStore } from "../../stores/app.store";
 import { listStore } from "../../stores/list.store";
@@ -14,13 +14,15 @@ interface ICrumbs {
   isLink: boolean;
 }
 
-class BreadcrumbsComponent extends MintComponent {
+class BreadcrumbsComponent extends MintScope {
+  crumbs: Resolver<Array<ICrumbs>>;
+
   goToLink: () => void;
 
   constructor() {
     super();
 
-    getter(this, "crumbs", () => {
+    this.crumbs = new Resolver(() => {
       let output: Array<ICrumbs> = [];
       if (appStore.rootData === null) return output;
 
@@ -43,7 +45,7 @@ class BreadcrumbsComponent extends MintComponent {
           toast("Unable to find this item, returning to home.", "tomato");
           (async () => {
             await wait();
-            upToRoot();
+            upLevel();
           })();
           return [];
         }
@@ -70,16 +72,16 @@ export const Breadcrumbs = component(
   "ul",
   BreadcrumbsComponent,
   { class: "breadcrumbs" },
-  element("li", { mFor: "crumbs", mKey: "_i", class: "breadcrumbs__item" }, [
-    element(
+  node("li", { mFor: mFor("crumbs"), mKey: "_i", class: "breadcrumbs__item" }, [
+    node(
       "span",
       {
-        mIf: "isLink",
+        mIf: mIf("isLink"),
         class: "breadcrumbs__item-link",
         "(click)": "goToLink",
       },
       "{content}"
     ),
-    element("span", { mIf: "!isLink" }, "{content}"),
+    node("span", { mIf: mIf("!isLink") }, "{content}"),
   ])
 );

@@ -1,24 +1,32 @@
-import { IStore, Resolver, Store } from "mint";
+import { refresh, Resolver, Store } from "mint";
 
-import { path } from "sage";
-
-import { getItem } from "../services/get-item.service";
+import { listStore } from "./list.store";
 
 import { Item } from "../models/Item.model";
 
-export const treeStore = new Store({
-  currentTitle: new Resolver(() => {
-    const item = getItem(path.get().slice(1));
-    if (item === null) return "";
-    return item.title;
-  }),
-
-  currentList: new Resolver(() => {
-    const item = getItem(path.get().slice(1));
-    if (item === null) return [];
-    return item.items;
-  }),
-}) as IStore & {
+class TreeStore extends Store {
+  showMessage: boolean;
   currentTitle: string;
   currentList: Array<Item>;
-};
+
+  constructor() {
+    super({
+      showMessage: false,
+
+      currentTitle: new Resolver(() => {
+        return listStore.item.title;
+      }),
+
+      currentList: new Resolver(() => {
+        return listStore.item.items;
+      }),
+
+      toggleShowMessage() {
+        treeStore.showMessage = !treeStore.showMessage;
+        refresh(treeStore);
+      },
+    });
+  }
+}
+
+export const treeStore = new TreeStore();

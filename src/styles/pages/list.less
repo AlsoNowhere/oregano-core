@@ -1,0 +1,140 @@
+.list-page {
+  &__main-buttons {
+    .flex;
+    width: @pageWidth;
+    .centred;
+    .margin-bottom-small;
+
+    &-button {
+      width: @sizeLarge;
+      height: @sizeLarge;
+      .margin-right-small;
+      .font-size;
+
+      .icon {
+        font-size: 1.2rem;
+      }
+    }
+  }
+
+  .flex-nowrap {
+    .list-page__message {
+      width: 45%;
+      padding-right: @gap;
+    }
+
+    .list-page__list-container {
+      width: 55%;
+    }
+  }
+
+  &__title {
+    .flex;
+    .flex-nowrap;
+    .space-between;
+    .align-start;
+    .relative;
+    .margin-bottom-small;
+
+    h2 {
+      margin: 0;
+      font-size: 1.3em;
+    }
+  }
+
+  &__message {
+    .margin-bottom-small;
+  }
+
+  &__container {
+    &-items {
+      width: @pageWidth;
+      .centred;
+    }
+  }
+
+  &__list {
+    width: 100%;
+    .margin-bottom;
+    .rounded;
+    box-shadow: 2px 2px 2px #444, 1px 1px 2px 3px #ccc;
+    .trim;
+  }
+
+  &__item {
+    position: relative;
+    line-height: 2rem;
+
+    &-container {
+      .flex;
+      flex-wrap: nowrap;
+      .space-between;
+    }
+
+    &-title {
+      .flex-grow;
+      .relative;
+      .padded;
+      background-color: inherit;
+      .pointer;
+      overflow: hidden;
+      .hover;
+
+      &:hover {
+        color: @black;
+
+        ~ [class*="list-page__item"] {
+          .smoke-light-bg;
+          color: @black;
+        }
+      }
+
+      &-p {
+        display: inline;
+        margin: 0;
+        white-space: nowrap;
+        overflow: hidden;
+      }
+
+      &-overflow {
+        .absolute;
+        top: 50%;
+        .right;
+        background-color: inherit;
+        transform: translateY(-50%);
+      }
+    }
+
+    &-has_message {
+      .flex;
+      align-content: center;
+      background-color: inherit;
+      .transition;
+
+      > span {
+        padding: 0 3px;
+      }
+    }
+
+    &-items_length {
+      background-color: inherit;
+      .line-height;
+      font-weight: bold;
+      .transition;
+
+      > span {
+        padding: 0 3px;
+      }
+    }
+
+    &-button {
+      color: inherit;
+    }
+  }
+
+  &__item-options {
+    .list;
+    .flex;
+    flex-wrap: nowrap;
+  }
+}

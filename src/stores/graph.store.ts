@@ -1,4 +1,4 @@
-import { IStore, Resolver, Store, refresh } from "mint";
+import { Resolver, Store, refresh } from "mint";
 
 import { path, wait } from "sage";
 
@@ -45,41 +45,48 @@ const loadData = () => {
     tooltip: true,
     maxY,
     minY,
+    interval: 0.5,
   });
 };
 
-export const graphStore = new Store({
-  currentTitle: new Resolver(() => {
-    const item = getItem(path.get().slice(1));
-    if (item === null) return "";
-    return item.title;
-  }),
-
-  currentList: new Resolver(() => {
-    const item = getItem(path.get().slice(1));
-    if (item === null) return [];
-    return item.items;
-  }),
-
-  svgClass: new Resolver(() => {
-    return `visibility: ${graphStore.showGraph ? "visible" : "hidden"};`;
-  }),
-
-  showGraph: false,
-  svgElementRef: null,
-
-  oninsert: async function () {
-    graphStore.showGraph = false;
-    await wait();
-    refresh(graphStore);
-    await wait(1000);
-    graphStore.showGraph = true;
-    refresh(graphStore);
-    loadData();
-  },
-}) as IStore & {
+class GraphStore extends Store {
   currentTitle: string;
   currentList: Array<Item>;
   showGraph: boolean;
   svgElementRef: SVGElement | null;
-};
+
+  constructor() {
+    super({
+      currentTitle: new Resolver(() => {
+        const item = getItem(path.get().slice(1));
+        if (item === null) return "";
+        return item.title;
+      }),
+
+      currentList: new Resolver(() => {
+        const item = getItem(path.get().slice(1));
+        if (item === null) return [];
+        return item.items;
+      }),
+
+      svgClass: new Resolver(() => {
+        return `visibility: ${graphStore.showGraph ? "visible" : "hidden"};`;
+      }),
+
+      showGraph: false,
+      svgElementRef: null,
+
+      oninsert: async function () {
+        graphStore.showGraph = false;
+        await wait();
+        refresh(graphStore);
+        await wait(300);
+        graphStore.showGraph = true;
+        refresh(graphStore);
+        loadData();
+      },
+    });
+  }
+}
+
+export const graphStore = new GraphStore();
