@@ -1,92 +1,28 @@
-import { IStore, Resolver, Store } from "mint";
-
-import { path } from "sage";
+import { Resolver, Store } from "mint";
 
 import { Item } from "../models/Item.model";
 
 import { IRootData } from "../interfaces/IRootData.interface";
 
-export const appStore = new Store({
-  rootData: null,
-  currentItem: null,
-  mainButtons: [],
-  secondaryButtons: [],
-  hasActions: true,
-  sessionStorageKey: null,
-  headerTitle: "Oregano",
-  version: "",
-
-  currentList: new Resolver(function () {
-    return this.currentItem?.list;
-  }),
-  currentTitle: new Resolver(function () {
-    return this.currentItem?.title;
-  }),
-
-  showList: new Resolver(function () {
-    const [url] = path.get();
-    return url === "list";
-  }),
-
-  showManage: new Resolver(function () {
-    const [url] = path.get();
-    return url === "manage";
-  }),
-
-  showExport: new Resolver(function () {
-    const [url] = path.get();
-    return url === "export";
-  }),
-
-  showImport: new Resolver(function () {
-    const [url] = path.get();
-    return url === "import";
-  }),
-
-  showTree: new Resolver(function () {
-    const [url] = path.get();
-    return url === "tree-view";
-  }),
-
-  showGraph: new Resolver(function () {
-    const [url] = path.get();
-    return url === "graph-view";
-  }),
-
-  showHeatmap: new Resolver(function () {
-    const [url] = path.get();
-    return url === "heat-map";
-  }),
-
-  showEditHeatmap: new Resolver(function () {
-    const [url] = path.get();
-    return url === "edit-heat-map";
-  }),
-
-  showSearch: new Resolver(function () {
-    const [url] = path.get();
-    return url === "search";
-  }),
-}) as IStore & {
+class AppStore extends Store {
   rootData: IRootData;
   currentItem: Item | null;
-  mainButtons: Array<string>;
-  secondaryButtons: Array<string>;
-  hasActions: boolean;
   sessionStorageKey: string | null;
-  headerTitle: string;
-  version: string;
-
-  currentList: Array<Item> | null;
+  loaded: boolean;
   currentTitle: string | null;
 
-  showList: boolean;
-  showManage: boolean;
-  showExport: boolean;
-  showImport: boolean;
-  showTree: boolean;
-  showGraph: boolean;
-  showHeatmap: boolean;
-  showEditHeatmap: boolean;
-  showSearch: boolean;
-};
+  constructor() {
+    super({
+      rootData: null,
+      currentItem: null,
+      sessionStorageKey: null,
+      loaded: false,
+
+      currentTitle: new Resolver(function () {
+        return appStore.currentItem?.title;
+      }),
+    });
+  }
+}
+
+export const appStore = new AppStore();

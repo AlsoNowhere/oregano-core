@@ -1,12 +1,10 @@
-import { MintComponent, component, div, element } from "mint";
+import { MintScope, component, div, mRef, node } from "mint";
 
-import { Field, Button, TField } from "thyme";
-
-import { AltButtons } from "../additions/AltButtons.component";
+import { Field, Button, TField, Tabs, TTabs } from "thyme";
 
 import { searchStore } from "../../stores/search.store";
 
-class SearchComponent extends MintComponent {
+class SearchComponent extends MintScope {
   constructor() {
     super();
 
@@ -14,75 +12,38 @@ class SearchComponent extends MintComponent {
   }
 }
 
-export const Search = component(
-  "div",
-  SearchComponent,
-  { class: "common-page" },
-  [
-    element(AltButtons),
-    element(
-      "div",
+export const Search = component("<>", SearchComponent, null, [
+  node("section", { class: "other-content__container" }, [
+    node("h2", { class: "reset-margin margin-bottom-small" }, "{currentTitle}"),
+
+    node(
+      "form",
       {
-        class: "other-content",
+        class: "flex",
+        "(submit)": "runSearch",
+        autocomplete: "off",
+        mRef: mRef("formElementRef"),
       },
-      element("section", { class: "other-content__container" }, [
-        element("h2", null, "{currentTitle}"),
-
-        element(
-          "form",
-          {
-            class: "flex",
-            "(submit)": "runSearch",
-            autocomplete: "off",
-            mRef: "formElementRef",
-          },
-          [
-            div({ class: "flex width-full" }, [
-              element<TField>(Field, {
-                name: "search",
-                placeholder: "Search ...",
-                wrapperClasses: "flex-grow margin-right-small",
-                "[value]": "value",
-                "[onInput]": "update",
-              }),
-
-              element(Button, {
-                type: "submit",
-                icon: "search",
-                class: "square",
-              }),
-            ]),
-
-            div(
-              element<TField>(Field, {
-                type: "checkbox",
-                label: "Include message",
-                name: "include-message",
-                "[checked]": "includeMessage",
-                "[onInput]": "onCheckIncludeMessage",
-                // mRef: "includeMessageRef",
-              })
-            ),
-          ]
-        ),
-
-        div({ mIf: "showNoItemFound" }, "-- No items found --"),
-
-        element(
-          "ul",
-          { class: "list" },
-          element(
-            "li",
-            {
-              mFor: "results",
-              mKey: "_i",
-              class: "card pointer hover",
-              "(click)": "selectRoute",
-            },
-            "{title}"
-          )
-        ),
-      ])
+      [
+        div({ class: "flex width-full" }, [
+          node<TField>(Field, {
+            name: "search",
+            placeholder: "Search ...",
+            wrapperClasses: "flex-grow margin-right-small",
+            "[value]": "value",
+            "[onInput]": "update",
+          }),
+          node(Button, {
+            type: "submit",
+            icon: "search",
+            class: "square",
+          }),
+        ]),
+      ]
     ),
-  ]
-);
+
+    node<TTabs>(Tabs, {
+      "[tabs]": "tabs",
+    }),
+  ]),
+]);

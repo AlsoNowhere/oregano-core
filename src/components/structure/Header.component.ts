@@ -1,21 +1,19 @@
-import { MintComponent, component, element, span } from "mint";
-
-import { appStore } from "../../stores/app.store";
+import { MintScope, component, node, span } from "mint";
 
 const lineProps = {
   y1: "4",
   y2: "28",
 };
 
-class HeaderComponent extends MintComponent {
+class HeaderComponent extends MintScope {
   headerTitle: string;
   version: string;
 
   constructor() {
     super();
 
-    this.headerTitle = appStore.headerTitle;
-    this.version = appStore.version;
+    this.headerTitle = "Oregano";
+    this.version = "";
   }
 }
 
@@ -24,40 +22,37 @@ export const Header = component(
   HeaderComponent,
   { class: "header" },
   [
-    element("h1", null, [
-      span("{headerTitle}"),
-      span({ style: "font-size:18px;line-height:18px;" }, "v{version}"),
-    ]),
-    element("div", { class: "flex" }, [
-      element(
+    node("h1", null, [span("{headerTitle}"), span("v{version}")]),
+    node("div", { class: "flex" }, [
+      node(
         "button",
         {
           type: "button",
           class: "empty snow-text font-size",
         },
-        element("span", {
+        node("span", {
           class: "block absolute middle width-small height",
         })
       ),
-      element(
+      node(
         "button",
         {
           type: "button",
           class: "empty",
         },
-        element(
+        node(
           "svg",
           {
             class: "absolute middle width height",
             viewBox: "0 0 32 32",
           },
           [
-            element("line", {
+            node("line", {
               x1: "4",
               x2: "28",
               ...lineProps,
             }),
-            element("line", {
+            node("line", {
               x1: "28",
               x2: "4",
               ...lineProps,

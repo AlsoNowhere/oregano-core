@@ -1,32 +1,28 @@
-import { MintElement } from "mint";
-import { TThemes } from "thyme";
+import { TMintContent } from "mint";
 
 export class MainButton {
   name: string;
   title: string;
   icon: string;
-  theme: TThemes;
   disabled: (() => boolean) | false;
   condition: (() => boolean) | true;
-  extraButtonLabel?: () => string | MintElement;
+  extraButtonLabel?: () => TMintContent;
   onClick: () => void;
 
   constructor(
     name: string,
     title: string,
     icon: string,
-    theme: TThemes,
     onClick: () => void,
     options: {
       disabled?: () => boolean;
       condition?: () => boolean;
-      extraButtonLabel?: () => string | MintElement;
+      extraButtonLabel?: () => TMintContent;
     } = {}
   ) {
     this.name = name;
     this.title = title;
     this.icon = icon;
-    this.theme = theme;
     this.onClick = onClick;
 
     this.disabled =

@@ -1,220 +1,194 @@
-import { IStore, MintEvent, Resolver, Store, refresh } from "mint";
+import { MintEvent, refresh, Resolver, Store } from "mint";
 
-import { path, styles, wait } from "sage";
+import { path, wait } from "sage";
 
 import { FieldsetOption } from "thyme";
 
 import { backToList } from "../services/back-to-list.service";
-import { getActionAbles, getActions } from "../services/get-actions.service";
-import { getTime } from "../services/get-time.service";
+import { getActionAbles } from "../services/get-actions.service";
 
 import { saveData } from "../logic/load-save.logic";
+import { setFocusOnFirstMainButton } from "../logic/set-focus-on-first-main-button.logic";
 
 import { listStore } from "./list.store";
-import { mainButtonsStore } from "./main-buttons.store";
-import { appStore } from "./app.store";
 
 import { Item } from "../models/Item.model";
-import { UndoConfig } from "../models/UndoConfig.model";
-import { ActionButton } from "../models/ActionButton.model";
+import { Tag } from "../models/Tag.model";
 
 import { IRootData } from "../interfaces/IRootData.interface";
 
-import { site } from "../data/site.data";
-import { actionButtons } from "../data/action-buttons.data";
 import { colours } from "../data/colours.data";
+import { actionButtons } from "../data/action-buttons.data";
 
-import { UndoConfigs } from "../enums/undo-configs.enum";
+import { ActionTypes } from "../enums/ActionTypes.enum";
+
+import { defaultManageChildren } from "../defaults/manage-children.default";
+
+const createInsert = () => {
+  manageStore.title = "";
+  manageStore.message = "";
+  manageStore.currentColour = manageStore.colours[0].value;
+  manageStore.tags = [];
+  actionButtons.forEach((x) => (x.active = false));
+};
+
+const editInsert = () => {
+  manageStore.title = manageStore.editItem.title;
+  {
+    const message = manageStore.editItem.message;
+    manageStore.message = message;
+  }
+
+  manageStore.currentColour = manageStore.editItem.colour;
+  manageStore.tags = manageStore.editItem.tags ?? [];
+  (manageStore.editItem.actions || []).forEach((_action) => {
+    const actionButton = actionButtons.find(({ id }) => id === _action);
+    if (actionButton === undefined) return;
+    actionButton.active = true;
+  });
+};
 
 const oninsert = async () => {
-  manageStore.showColours = true;
-
-  actionButtons.forEach((actionButton) => {
-    actionButton.active = false;
-  });
-
   const isEdit = manageStore.editItem !== null;
 
   if (!isEdit) {
-    // ** Create
-    manageStore.title = "";
-    manageStore.message = "";
-    manageStore.currentColour = manageStore.colours[0].value;
+    createInsert();
   } else {
-    // ** Edit
-    const editItem = manageStore.editItem as IRootData;
-    if (editItem.root === true) {
-      manageStore.showColours = false;
-    }
-    manageStore.title = manageStore.editItem.title;
-    {
-      const message = manageStore.editItem.message;
-      manageStore.message =
-        message instanceof Array ? message.join("\n==b\n") : message;
-    }
-    manageStore.currentColour = manageStore.editItem.colour;
-    (manageStore.editItem.actions || []).forEach((_action) => {
-      const actionButton = actionButtons.find(({ id }) => id === _action);
-      if (actionButton === undefined) return;
-      actionButton.active = true;
-    });
+    editInsert();
   }
 
   await wait();
   const form = manageStore.manageFormElementRef;
+
   if (form !== null) {
-    const titleElementRef = Array.from(form.elements)
-      .filter((x) => x instanceof HTMLInputElement)
-      .find((x: HTMLInputElement) => x.name === "title");
-    if (titleElementRef instanceof HTMLInputElement) {
-      titleElementRef?.focus?.();
-    }
-    if (manageStore.showColours) {
-      const colourElements = form.colour;
-      const colours = Array.from(colourElements) as Array<HTMLInputElement>;
-      colours.forEach(async (x) => {
-        if (x.value !== manageStore.currentColour) return;
-        await wait();
-        x.checked = true;
-      });
-    }
+    const titleElementRef = (
+      [...form.elements] as Array<HTMLInputElement | HTMLButtonElement>
+    ).find((x) => x.name === "title");
+
+    titleElementRef?.focus();
   }
 
   refresh(manageStore);
 };
 
-const onSubmit: MintEvent<HTMLFormElement> = (event) => {
-  event.preventDefault();
-  const { title, currentColour } = manageStore;
-  const message = (() => {
-    const { message } = manageStore;
-    const messages = message.split("\n==b\n");
-    return messages.length > 1 ? messages : message;
-  })();
-  const actions = getActions();
+const createItem = () => {
+  const tags =
+    manageStore.tags.length === 0 ? undefined : [...manageStore.tags];
 
-  if (manageStore.editItem === null) {
-    // ** Create
-    const newItem = new Item(title, message, currentColour, actions);
+  const newItem = new Item();
+
+  const elements = [...manageStore.manageFormElementRef.elements] as Array<
+    HTMLInputElement | HTMLButtonElement
+  >;
+
+  if (elements.find((x) => x.name === "title")) {
+    newItem.title = manageStore.title;
+  }
+  if (elements.find((x) => x.name === "message")) {
+    newItem.message = manageStore.message;
+  }
+  if (elements.find((x) => x.name === "colour")) {
+    newItem.colour = manageStore.currentColour;
+  }
+
+  if (!!tags) {
+    newItem.tags = tags;
+  }
+
+  newItem.actions = actionButtons
+    .filter(({ active }) => active)
+    .map((x) => x.id);
+
+  {
+    const actions = getActionAbles(newItem.actions, ActionTypes.init);
+    actions.forEach((x) => {
+      if (x instanceof Function) {
+        x(newItem);
+      }
+    });
+  }
+
+  {
+    // ** There should only be one action that matches this if any do.
+    // ** We don't want several to run.
     const [action] = getActionAbles(
-      listStore.currentItem.actions || [],
-      "add-to-list"
+      newItem.actions,
+      ActionTypes["add-to-list"]
     );
     if (action instanceof Function) {
-      action(listStore.currentItem, newItem);
+      action(listStore.item, newItem);
     } else {
       listStore.list.push(newItem);
     }
-    appStore.rootData.undoItems = [
-      new UndoConfig(UndoConfigs.add, {
-        item: newItem,
-        path: path.get().slice(1),
-      }),
-    ];
-    getActionAbles(actions || [], "init").forEach(
-      (x) => x instanceof Function && x(newItem)
-    );
+  }
+};
+
+const editItem = () => {
+  const { editItem } = manageStore;
+
+  {
+    const actions = getActionAbles(editItem.actions || [], ActionTypes.init);
+    actions.forEach((x) => {
+      if (x instanceof Function) {
+        x(editItem);
+      }
+    });
+  }
+
+  const elements = [...manageStore.manageFormElementRef.elements] as Array<
+    HTMLInputElement | HTMLButtonElement
+  >;
+
+  if (elements.find((x) => x.name === "title")) {
+    editItem.title = manageStore.title;
+  }
+  if (elements.find((x) => x.name === "message")) {
+    editItem.message = manageStore.message;
+  }
+  if (elements.find((x) => x.name === "colour")) {
+    editItem.colour = manageStore.currentColour;
+  }
+
+  manageStore.editItem.actions = actionButtons
+    .filter(({ active }) => active)
+    .map((x) => x.id);
+
+  {
+    const tags =
+      manageStore.tags.length === 0 ? undefined : [...manageStore.tags];
+    manageStore.editItem.tags = tags;
+  }
+
+  manageStore.editItem = null;
+};
+
+const onSubmit: MintEvent<HTMLFormElement> = (event) => {
+  event.preventDefault();
+
+  if (manageStore.editItem === null) {
+    createItem();
   } else {
-    // ** Edit
-    manageStore.editItem.title = title;
-    manageStore.editItem.message = message;
-    manageStore.editItem.colour = currentColour;
-    manageStore.editItem.actions = actions;
-    if (!(manageStore.editItem.edits instanceof Array))
-      manageStore.editItem.edits = [];
-    manageStore.editItem.edits.push(getTime());
-    manageStore.editItem = null;
+    editItem();
   }
 
   saveData();
 
-  listStore.depthIndexing = path.get().slice(1);
   backToList();
-  (async () => {
-    await wait();
-    const [
-      {
-        children: [button],
-      },
-    ] = mainButtonsStore.mainButtonsElement.children;
-    (button as HTMLElement)?.focus?.();
-  })();
+  setFocusOnFirstMainButton();
 };
 
-export const manageStore = new Store({
-  title: "",
-  message: "",
-  colours: colours.map(
-    (x) =>
-      ({
-        value: x.colour,
-      } as FieldsetOption)
-  ),
-  currentColour: colours[0].colour,
-
-  hasActions: new Resolver(() => appStore.hasActions),
-  actionButtons: new Resolver(() => site.actionButtons),
-  editItem: null,
-  manageFormElementRef: null,
-  showColours: true,
-
-  isChecked: new Resolver(function () {
-    return false;
-  }),
-
-  mainLabel: new Resolver(() =>
-    manageStore.editItem !== null ? "Edit" : "Add"
-  ),
-
-  getTheme: new Resolver(function () {
-    return this.active ? "blueberry" : "snow";
-  }),
-
-  saveButtonLabel: new Resolver(() =>
-    manageStore.editItem !== null ? "Edit" : "Add"
-  ),
-
-  saveButtonTheme: new Resolver(() =>
-    manageStore.editItem !== null ? "apple" : "blueberry"
-  ),
-
-  radioStyles: new Resolver(function () {
-    return styles({
-      "box-shadow": `inset 0 0 2px 2px ${this.value};`,
-    });
-  }),
-
-  setTitle(_, element) {
-    manageStore.title = element.value;
-  },
-  setMessage(_, element) {
-    manageStore.message = element.value;
-  },
-  setColour(_, element) {
-    manageStore.currentColour = element.value;
-  },
-
-  oninsert,
-
-  onSubmit,
-
-  cancel() {
-    listStore.depthIndexing = path.get().slice(1);
-    backToList();
-  },
-}) as IStore & {
+class ManageStore extends Store {
+  manageFormElementRef: HTMLFormElement | null;
   title: string;
   message: string;
   colours: Array<FieldsetOption>;
   currentColour: string;
+  tagsValue: string;
+  tags: Array<Tag>;
+  tagsScope: {};
+  toEditMethod: "main-button" | "item-button";
 
-  hasActions: boolean;
-  actionButtons: Array<ActionButton>;
-  editItem: Item | null;
-  manageFormElementRef: HTMLFormElement | null;
-  showColours: boolean;
-
-  isChecked: boolean;
+  editItem: IRootData | Item | null;
 
   setTitle: MintEvent;
   setMessage: MintEvent;
@@ -223,6 +197,62 @@ export const manageStore = new Store({
   onSubmit: MintEvent;
 
   cancel: () => void;
-};
 
-site.manageStore = manageStore;
+  constructor() {
+    super({
+      defaultChildren: () => defaultManageChildren,
+
+      manageFormElementRef: null,
+      title: "",
+      message: "",
+      colours: colours.map(
+        (x) =>
+          ({
+            value: x.colour,
+          } as FieldsetOption)
+      ),
+      currentColour: colours[0].colour,
+      tagsValue: "",
+      tags: [],
+      tagsScope: null,
+      toEditMethod: "main-button",
+
+      editItem: null,
+
+      mainLabel: new Resolver(() =>
+        manageStore.editItem !== null ? "Edit" : "Add"
+      ),
+
+      saveButtonLabel: new Resolver(() =>
+        manageStore.editItem !== null ? "Edit" : "Add"
+      ),
+
+      saveButtonTheme: new Resolver(() =>
+        manageStore.editItem !== null ? "apple" : "blueberry"
+      ),
+
+      setTitle(_, element) {
+        manageStore.title = element.value;
+      },
+      setMessage(_, element) {
+        manageStore.message = element.value;
+      },
+      setColour(_, element) {
+        manageStore.currentColour = element.value;
+      },
+
+      oninsert,
+
+      onSubmit,
+
+      cancel() {
+        if (manageStore.toEditMethod === "item-button") {
+          path.set(path.get().slice(0, -1));
+        }
+        backToList();
+      },
+    });
+  }
+}
+
+export const manageStore = new ManageStore();

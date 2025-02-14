@@ -1,10 +1,10 @@
 import { MintEvent, refresh } from "mint";
 
-import { TThemes } from "thyme";
+import { manageStore } from "../stores/manage.store";
+
+import { Action } from "./Action.model";
 
 import { actionButtons } from "../data/action-buttons.data";
-import { site } from "../data/site.data";
-import { Action } from "./Action.model";
 
 type options = {
   label?: string;
@@ -19,7 +19,6 @@ export class ActionButton {
   title: string;
   id: string;
   active: boolean;
-  theme: TThemes;
   action?: Action;
   onClick: MintEvent;
 
@@ -29,13 +28,14 @@ export class ActionButton {
     this.title = title;
     this.action = action;
     this.onClick = function () {
-      const actionButton = actionButtons.find(({ id }) => id === this.id);
+      const buttonScope = this;
+      const actionButton = actionButtons.find(
+        ({ id }) => id === buttonScope.id
+      );
       actionButton.active = !actionButton.active;
-      actionButton.theme = actionButton.active ? "blueberry" : "snow";
-      refresh(site.manageStore);
+      refresh(manageStore);
     };
     this.id = id;
     this.active = false;
-    this.theme = "snow";
   }
 }

@@ -1,10 +1,10 @@
-import { MintComponent, component, div, element } from "mint";
+import { MintScope, component, div, mIf, mRef, node } from "mint";
 
-import { AltButtons } from "../additions/AltButtons.component";
+import { styles } from "sage";
 
 import { graphStore } from "../../stores/graph.store";
 
-class GraphviewComponent extends MintComponent {
+class GraphviewComponent extends MintScope {
   constructor() {
     super();
 
@@ -13,35 +13,32 @@ class GraphviewComponent extends MintComponent {
 }
 
 export const GraphView = component(
-  "div",
+  "section",
   GraphviewComponent,
   { class: "common-page" },
   [
-    element(AltButtons),
-
-    element(
-      "section",
-      { class: "other-content" },
-      element("div", { class: "other-content__container" }, [
-        element(
-          "div",
-          { class: "other-content__title margin-bottom" },
-          "{currentTitle}"
-        ),
-        // div(
-        //   {
-        //     mIf: "!showGraph"
-        //   },
-        //   "Loading..."
-        // ),
-        element("svg", {
-          mIf: "showGraph",
-          class: "svgClass",
-          viewBox: "0 0 836 420",
-          style: "width:836px;height:420px;",
-          mRef: "svgElementRef",
+    node("div", { class: "other-content__container" }, [
+      node(
+        "div",
+        { class: "other-content__title margin-bottom" },
+        "{currentTitle}"
+      ),
+      div(
+        {
+          mIf: mIf("!showGraph"),
+        },
+        "Loading..."
+      ),
+      node("svg", {
+        mIf: mIf("showGraph"),
+        class: "svgClass",
+        viewBox: "0 0 836 420",
+        style: styles({
+          width: "836px",
+          height: "420px",
         }),
-      ])
-    ),
+        mRef: mRef("svgElementRef"),
+      }),
+    ]),
   ]
 );

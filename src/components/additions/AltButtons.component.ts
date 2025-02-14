@@ -1,55 +1,47 @@
-import { MintComponent, component, element, refresh } from "mint";
+import { MintScope, component, node } from "mint";
+
+import { Button } from "thyme";
 
 import { path } from "sage";
 
 import { backToList } from "../../services/back-to-list.service";
 
-import { listStore } from "../../stores/list.store";
-import { appStore } from "../../stores/app.store";
+import { manageStore } from "../../stores/manage.store";
 
-class AltButtonsComponent extends MintComponent {
+class AltButtonsComponent extends MintScope {
   type: "normal" | "edit-heat-map";
   backToList: () => void;
 
   constructor() {
     super();
 
-    this.type = "normal";
-
     this.backToList = () => {
-      if (this.type === "normal") {
-        listStore.depthIndexing = path.get().slice(1);
-        backToList();
-      } else if (this.type === "edit-heat-map") {
-        path.set(["heat-map", ...path.get().slice(1, -1)]);
-        refresh(appStore);
-      } else {
-        path.set([this.type, ...path.get().slice(1, -1)]);
-        refresh(appStore);
+      if (manageStore.toEditMethod === "item-button") {
+        path.set(path.get().slice(0, -1));
+        manageStore.toEditMethod = "main-button";
       }
+      backToList();
     };
   }
 }
 
 export const AltButtons = component(
-  "section",
+  "div",
   AltButtonsComponent,
   { class: "alt-buttons" },
-  element(
+  node(
     "ul",
     { class: "list" },
-    element(
+    node(
       "li",
       null,
-      element(
-        "button",
-        {
-          type: "button",
-          class: "button blueberry large square",
-          "(click)": "backToList",
-        },
-        element("span", { class: "fa fa-arrow-left" })
-      )
+      node(Button, {
+        theme: "blueberry",
+        icon: "arrow-left",
+        large: true,
+        square: true,
+        "[onClick]": "backToList",
+      })
     )
   )
 );

@@ -2,13 +2,15 @@ import { actionButtons } from "../data/action-buttons.data";
 
 import { TAction } from "../types/TAction.type";
 
+import { ActionTypes } from "../enums/ActionTypes.enum";
+
 export const getActions = () =>
   actionButtons.reduce(
     (a, { active, id }) => (active && a.push(id), a),
     [] as Array<string>
   );
 
-export const getActionAbles = (actions: Array<string>, match: string) => {
+export const getActionAbles = (actions: Array<string>, match: ActionTypes) => {
   const _actions: Array<TAction | string> = [];
   let i = 0;
   while (i < actions.length) {

@@ -1,8 +1,6 @@
 import { Item } from "./Item.model";
 
-import { UndoConfigs } from "../enums/undo-configs.enum";
-
-// { item: Item; path: Array<string>; items: Array<Item> }
+import { UndoConfigs } from "../enums/UndoConfigs.enum";
 
 type options =
   | {
@@ -18,6 +16,7 @@ type options =
 
 export class UndoConfig {
   type: UndoConfigs;
+
   item: Item;
   path: Array<string>;
   items: Array<Item>;

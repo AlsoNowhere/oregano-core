@@ -1,10 +1,21 @@
-import { MintComponent, component, element, span } from "mint";
+import {
+  MintScope,
+  component,
+  div,
+  mFor,
+  mIf,
+  node,
+  refresh,
+  span,
+} from "mint";
 
-import { AltButtons } from "../additions/AltButtons.component";
+import { Button } from "thyme";
+
+import { Message } from "./list/Message.component";
 
 import { heatmapStore } from "../../stores/heatmap.store";
 
-class HeatmapComponent extends MintComponent {
+class HeatmapComponent extends MintScope {
   constructor() {
     super();
 
@@ -13,66 +24,83 @@ class HeatmapComponent extends MintComponent {
 }
 
 export const Heatmap = component(
-  "div",
+  "section",
   HeatmapComponent,
   { class: "common-page" },
   [
-    element(AltButtons),
+    node("h2", { class: "reset-margin margin-bottom" }, "Heat map"),
 
-    element(
-      "section",
-      { class: "other-content" },
-      element("div", { class: "other-content__container" }, [
-        element("h2", null, "Heat map"),
+    div({ mIf: mIf("!isEditing") }, [
+      node("p", { class: "reset-margin margin-bottom" }, "{month} - {year}"),
 
-        element("p", null, "{month} - {year}"),
+      node(
+        "ul",
+        { class: "list flex", style: "width:224px;" },
+        node(
+          "li",
+          {
+            mFor: mFor("weekDays"),
+            mKey: "_i",
+            class: "relative width height",
+          },
+          span({ class: "block absolute middle bold" }, "{_x}")
+        )
+      ),
 
-        element(
-          "ul",
-          { class: "list flex", style: "width:224px;" },
-          element(
-            "li",
-            {
-              mFor: "weekDays",
-              mKey: "_i",
-              class: "relative width height",
-            },
-            span({ class: "block absolute middle bold" }, "{_x}")
-          )
-        ),
-
-        element(
-          "ul",
-          { class: "list flex", style: "width:224px;" },
-          element(
-            "li",
-            {
-              mFor: "heatmap",
-              mKey: "_i",
-              class: "relative width height",
-            },
-            [
-              element("span", {
-                mIf: "hidden",
+      node(
+        "ul",
+        { class: "list flex", style: "width:224px;" },
+        node(
+          "li",
+          {
+            mFor: mFor("heatmap"),
+            mKey: "_i",
+            class: "relative width height",
+          },
+          [
+            node("span", {
+              mIf: mIf("hidden"),
+              class:
+                "block absolute middle width height smoke-bg border rounded unselect",
+            }),
+            node(
+              "span",
+              {
+                mIf: mIf("!hidden"),
                 class:
-                  "block absolute middle width height smoke-bg border rounded unselect",
-              }),
-              element(
-                "span",
-                {
-                  mIf: "!hidden",
-                  class:
-                    "block absolute middle width height border rounded {getShadow} text-centre line-height bold font-size-small hover pointer unselect",
-                  "[title]": "title",
-                  "[style]": "style",
-                  "(click)": "editHeatmap",
-                },
-                "{day}"
-              ),
-            ]
-          )
-        ),
-      ])
-    ),
+                  "block absolute middle width height border rounded {getShadow} text-centre line-height bold font-size-small hover pointer unselect",
+                "[title]": "title",
+                "[style]": "style",
+                "(click)": "editHeatmap",
+              },
+              "{day}"
+            ),
+          ]
+        )
+      ),
+    ]),
+
+    div({ mIf: mIf("isEditing") }, [
+      div(
+        { class: "margin-bottom" },
+        node(Button, {
+          icon: "level-up",
+          square: true,
+          large: true,
+          onClick() {
+            heatmapStore.isEditing = false;
+            refresh(heatmapStore);
+          },
+        })
+      ),
+
+      node(
+        "p",
+        { class: "reset-margin margin-bottom" },
+        "Edit date: {editingDate}"
+      ),
+
+      node(Message, { "[message]": "message" }),
+    ]),
   ]
 );

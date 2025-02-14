@@ -1,25 +1,18 @@
-import { IStore, Resolver, Store } from "mint";
+import { Resolver, Store } from "mint";
 
-import { mainButtons } from "../data/main-button-options.data";
-import { secondaryButtons } from "../data/secondary-button-options.data";
-import { appStore } from "./app.store";
+import { path } from "sage";
 
-export const mainButtonsStore = new Store({
-  mainButtonsElement: null,
-
-  mainButtons: new Resolver(() => {
-    return mainButtons
-      .filter((x) => appStore.mainButtons.includes(x.name))
-      .filter((x) => x.disabled === false || !x.disabled());
-  }),
-
-  secondaryButtons: new Resolver(() =>
-    secondaryButtons
-      .filter((x) => appStore.secondaryButtons.includes(x.name))
-      .filter(({ condition }) => {
-        return condition instanceof Function ? condition() : condition;
-      })
-  ),
-}) as IStore & {
+class MainButtonsStore extends Store {
   mainButtonsElement: HTMLUListElement | null;
-};
+  isList: Resolver<boolean>;
+
+  constructor() {
+    super({
+      mainButtonsElement: null,
+
+      isList: new Resolver(() => path.get().at(0) === "list"),
+    });
+  }
+}
+
+export const mainButtonsStore = new MainButtonsStore();

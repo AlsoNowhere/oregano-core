@@ -1,14 +1,12 @@
-import { MintComponent, component, element } from "mint";
+import { MintScope, component, mRef, node } from "mint";
 
 import { styles } from "sage";
 
 import { Field, Button, TField } from "thyme";
 
-import { AltButtons } from "../additions/AltButtons.component";
-
 import { importStore } from "../../stores/import.store";
 
-class ImportDataComponent extends MintComponent {
+class ImportDataComponent extends MintScope {
   constructor() {
     super();
 
@@ -21,23 +19,21 @@ export const ImportData = component(
   ImportDataComponent,
   { class: "common-page" },
   [
-    element(AltButtons),
-
-    element(
+    node(
       "div",
       { class: "other-content" },
-      element("section", { class: "other-content__container" }, [
-        element("h2", { class: "no-margin" }, "Import into - {currentTitle}"),
+      node("section", { class: "other-content__container" }, [
+        node("h2", { class: "no-margin" }, "Import into - {currentTitle}"),
 
-        element(
+        node(
           "form",
           {
             class: "form",
             "(submit)": "onSubmit",
-            mRef: "importFormElement",
+            mRef: mRef("importFormElement"),
           },
           [
-            element<TField>(Field, {
+            node<TField>(Field, {
               type: "textarea",
               name: "importValue",
               label: "Enter JSON data here",
@@ -47,7 +43,7 @@ export const ImportData = component(
               }),
               "[onInput]": "onInput",
             }),
-            element(Button, {
+            node(Button, {
               type: "submit",
               theme: "apple",
               class: "button large padded",

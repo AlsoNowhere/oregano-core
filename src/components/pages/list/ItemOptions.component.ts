@@ -1,53 +1,19 @@
-import { component, element } from "mint";
+import { component, MintScope, node, template, TMintContent } from "mint";
 
-import { Button } from "thyme";
+import { listStore } from "../../../stores/list.store";
 
-export const ItemOptions = component(
-  "ul",
-  null,
-  { class: "list-page__item-options" },
-  [
-    element(
-      "li",
-      {
-        mIf: "showItemsNumber",
-        class: "relative",
-      },
-      element(
-        "span",
-        {
-          class:
-            "padded-small abso-lute mid-dle blueberry-text snow-text-shadow bold",
-        },
-        "{itemsCount}"
-      )
-    ),
+class ItemOptionsComponent extends MintScope {
+  getItemOptions: () => TMintContent;
 
-    element(
-      "li",
-      {
-        mIf: "hasMessage",
-        class: "relative width height",
-      },
-      element("span", {
-        class: "fa fa-list absolute middle blueberry-text",
-      })
-    ),
+  constructor() {
+    super();
 
-    element(
-      "li",
-      {
-        mFor: "itemActions",
-        mKey: "_i",
-      },
-      element(Button, {
-        theme: "empty",
-        "[icon]": "icon",
-        square: true,
-        "[onClick]": "action",
-        // "[itemIndex]": "getIndex",
-        "[itemIndex]": "itemIndex",
-      })
-    ),
-  ]
-);
+    this.getItemOptions = function () {
+      return listStore.itemOptions.map((x) => node(x, { "[index]": "index" }));
+    };
+  }
+}
+
+export const ItemOptions = component("<>", ItemOptionsComponent, null, [
+  node(template({ conditionedBy: "index" }, "getItemOptions")),
+]);
