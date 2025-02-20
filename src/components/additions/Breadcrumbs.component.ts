@@ -9,13 +9,19 @@ import { listStore } from "../../stores/list.store";
 
 import { IData } from "../../interfaces/IData.interface";
 
-interface ICrumbs {
-  content: string;
-  isLink: boolean;
-}
+type TCrumbs =
+  | {
+      content: string;
+      isLink: true;
+      target: string;
+    }
+  | {
+      content: string;
+      isLink: false;
+    };
 
 class BreadcrumbsComponent extends MintScope {
-  crumbs: Resolver<Array<ICrumbs>>;
+  crumbs: Resolver<Array<TCrumbs>>;
 
   goToLink: () => void;
 
@@ -23,7 +29,8 @@ class BreadcrumbsComponent extends MintScope {
     super();
 
     this.crumbs = new Resolver(() => {
-      let output: Array<ICrumbs> = [];
+      let output: Array<TCrumbs> = [];
+
       if (appStore.rootData === null) return output;
 
       const url = path.get();
@@ -34,13 +41,24 @@ class BreadcrumbsComponent extends MintScope {
       }
 
       if (url.length === 1) return [{ content: " ", isLink: false }];
+
       let data: IData = appStore.rootData;
-      const crumbs: Array<ICrumbs> = url.reduce((a, b, i) => {
+
+      const crumbs: Array<TCrumbs> = url.reduce((a, b, i) => {
+        const index = i;
+        const target = url.slice(0, index + 1).join("/");
+
         if (i === 0) {
-          a.push({ content: data.title, isLink: true });
+          a.push({
+            content: data.title,
+            isLink: true,
+            target,
+          });
           return a;
         }
+
         data = data.items[b];
+
         if (data === undefined) {
           toast("Unable to find this item, returning to home.", "tomato");
           (async () => {
@@ -49,20 +67,23 @@ class BreadcrumbsComponent extends MintScope {
           })();
           return [];
         }
-        a.push(
-          { content: "/", isLink: false },
-          { content: data.title, isLink: i !== url.length - 1 }
-        );
+
+        a.push({ content: "/", isLink: false });
+
+        if (i !== url.length - 1) {
+          a.push({ content: data.title, isLink: true, target });
+        } else {
+          a.push({ content: data.title, isLink: false });
+        }
+
         return a;
-      }, [] as Array<ICrumbs>);
+      }, [] as Array<TCrumbs>);
       output = crumbs;
       return output;
     });
 
-    this.goToLink = function () {
-      const url = path.get();
-      const index = this._i / 2;
-      path.set(url.slice(0, index + 1));
+    this.goToLink = async function () {
+      await wait();
       refresh(listStore);
     };
   }
@@ -74,9 +95,10 @@ export const Breadcrumbs = component(
   { class: "breadcrumbs" },
   node("li", { mFor: mFor("crumbs"), mKey: "_i", class: "breadcrumbs__item" }, [
     node(
-      "span",
+      "a",
       {
         mIf: mIf("isLink"),
+        href: "#{target}",
         class: "breadcrumbs__item-link",
         "(click)": "goToLink",
       },

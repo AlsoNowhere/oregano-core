@@ -1,6 +1,6 @@
 import { MintScope, component, div, mIf, mRef, node } from "mint";
 
-import { AltButtons } from "./AltButtons.component";
+import { AltButtons } from "./main-buttons/AltButtons.component";
 
 import { mainButtonsStore } from "../../stores/main-buttons.store";
 

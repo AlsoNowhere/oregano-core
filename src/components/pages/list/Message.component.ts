@@ -6,6 +6,7 @@ import {
   template,
   TMintContent,
   refresh,
+  span,
 } from "mint";
 
 import { Field, TField } from "thyme";
@@ -74,35 +75,51 @@ const getTemplate = (message: string, scope: MintScope) => {
   const output = splits.map((x, i) => {
     let element = "p";
 
+    const classes = ["reset-margin"];
+
+    // ** Order is important below
+
+    // ** Checkbox
     if (x.includes("--c")) {
       return resolveCheckbox(splits, x, i, scope);
     }
 
+    // ** Code
     if (x.includes("--<>")) {
       x = x.replace("--<>", "");
       element = "code";
     }
 
-    const classes = ["reset-margin"];
-
+    // ** Font Bold
     if (x.includes("--b")) {
       x = x.replace(/--b/g, "");
       classes.push("bold");
     }
 
+    // ** Font Underline
     if (x.includes("--u")) {
       x = x.replace(/--u/g, "");
       classes.push("underline");
     }
 
+    // ** Font Italic
     if (x.includes("--i")) {
       x = x.replace(/--i/g, "");
       classes.push("italic");
     }
 
+    // ** Add gap before and after
     if (x.includes("--gap")) {
       x = x.replace(/--gap/g, "");
       classes.push("margin-top margin-bottom");
+    }
+
+    if (x.includes("--")) {
+      x = x.replace(/--/g, "");
+      return node(element, { class: classes.join(" ") }, [
+        span({ class: "fa fa-circle font-size-small" }),
+        span(x),
+      ]);
     }
 
     let content: string | TMintContent = x;
@@ -119,7 +136,7 @@ const getTemplate = (message: string, scope: MintScope) => {
 
 class MessageComponent extends MintScope {
   message: string;
-  class: string;
+  messageClass: string;
   currentStyles: Resolver<string>;
   messageTemplate: () => TMintContent;
 
@@ -127,7 +144,7 @@ class MessageComponent extends MintScope {
     super();
 
     this.message = "";
-    this.class = "";
+    this.messageClass = "";
 
     this.currentStyles = new Resolver(() => {
       const { item } = listStore;
@@ -153,6 +170,6 @@ class MessageComponent extends MintScope {
 export const Message = component(
   "div",
   MessageComponent,
-  { class: "list-page__message {class}" },
+  { class: "list-page__message {messageClass}" },
   [node(template({ conditionedBy: "message" }, "messageTemplate"))]
 );

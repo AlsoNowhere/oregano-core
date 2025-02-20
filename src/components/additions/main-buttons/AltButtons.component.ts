@@ -4,9 +4,9 @@ import { Button } from "thyme";
 
 import { path } from "sage";
 
-import { backToList } from "../../services/back-to-list.service";
+import { backToList } from "../../../services/back-to-list.service";
 
-import { manageStore } from "../../stores/manage.store";
+import { manageStore } from "../../../stores/manage.store";
 
 class AltButtonsComponent extends MintScope {
   type: "normal" | "edit-heat-map";

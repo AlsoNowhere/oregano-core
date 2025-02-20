@@ -61,7 +61,7 @@ export const List = component(
         node("div", { class: "flex" }, [
           node(Message, {
             "[message]": "item.message",
-            "[class]": "messageClass",
+            "[messageClass]": "messageClass",
           }),
 
           div(
@@ -84,21 +84,18 @@ export const List = component(
                     "background-color": "{colour}",
                     color: "{getTextColour}",
                   }),
-                  "(click)": "selectItem",
                   mExtend: mExtend(dragDrop),
                 },
                 node(
                   "div",
                   {
                     class: "list-page__item-container",
-                    style: styles({
-                      "background-color": "{colour}",
-                    }),
                   },
                   [
                     node(ItemTitle, {
                       "[title]": "title",
                       "[index]": "_i",
+                      "[selectItem]": "selectItem",
                     }),
                     node(ItemOptions, {
                       "[index]": "_i",

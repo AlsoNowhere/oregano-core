@@ -44,6 +44,7 @@
 
   &__message {
     .margin-bottom-small;
+    .break-word;
   }
 
   &__container {
@@ -58,7 +59,6 @@
     .margin-bottom;
     .rounded;
     box-shadow: 2px 2px 2px #444, 1px 1px 2px 3px #ccc;
-    .trim;
   }
 
   &__item {
@@ -76,9 +76,12 @@
       .relative;
       .padded;
       background-color: inherit;
+      color: @black;
+      text-decoration: none;
       .pointer;
       overflow: hidden;
       .hover;
+      .focus;
 
       &:hover {
         color: @black;
@@ -129,6 +132,16 @@
 
     &-button {
       color: inherit;
+    }
+
+    &:first-child {
+      border-top-left-radius: @rounding;
+      border-top-right-radius: @rounding;
+    }
+
+    &:last-child {
+      border-bottom-left-radius: @rounding;
+      border-bottom-right-radius: @rounding;
     }
   }
 
