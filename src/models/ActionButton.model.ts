@@ -1,6 +1,6 @@
 import { MintEvent, refresh } from "mint";
 
-import { manageStore } from "../stores/manage.store";
+import { actionStore } from "../stores/actions.store";
 
 import { Action } from "./Action.model";
 
@@ -33,7 +33,7 @@ export class ActionButton {
         ({ id }) => id === buttonScope.id
       );
       actionButton.active = !actionButton.active;
-      refresh(manageStore);
+      refresh(actionStore);
     };
     this.id = id;
     this.active = false;

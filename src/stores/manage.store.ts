@@ -41,6 +41,7 @@ const editInsert = () => {
 
   manageStore.currentColour = manageStore.editItem.colour;
   manageStore.tags = manageStore.editItem.tags ?? [];
+  actionButtons.forEach((x) => (x.active = false));
   (manageStore.editItem.actions || []).forEach((_action) => {
     const actionButton = actionButtons.find(({ id }) => id === _action);
     if (actionButton === undefined) return;

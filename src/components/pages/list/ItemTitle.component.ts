@@ -1,6 +1,6 @@
 import { component, MintScope, mIf, node, Resolver, refresh } from "mint";
 
-import { wait } from "sage";
+import { path, wait } from "sage";
 
 import { listStore } from "../../../stores/list.store";
 
@@ -9,6 +9,7 @@ class ItemTitleComponent extends MintScope {
   backgroundColor: string;
   textColor: string;
   showOverflow: Resolver<boolean>;
+  url: Resolver<string>;
 
   constructor() {
     super();
@@ -38,14 +39,18 @@ class ItemTitleComponent extends MintScope {
       if (p.offsetWidth < title.offsetWidth) return false;
       return true;
     });
+
+    this.url = new Resolver(() => path.get().join("/"));
   }
 }
 
 export const ItemTitle = component(
-  "div",
+  "a",
   ItemTitleComponent,
   {
+    href: "#{url}/{index}",
     class: "list-page__item-title",
+    "(click)": "selectItem",
   },
   [
     node("p", { class: "list-page__item-title-p" }, "{title}"),

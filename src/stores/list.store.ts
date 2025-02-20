@@ -1,6 +1,6 @@
 import { MintComponent, Resolver, Store, refresh } from "mint";
 
-import { path } from "sage";
+import { path, wait } from "sage";
 
 import { getItem } from "../services/get-item.service";
 
@@ -68,9 +68,8 @@ class ListStore extends Store {
           : "grid-12"
       ),
 
-      selectItem() {
-        const nextIndex = this._i + "";
-        path.set([...path.get(), nextIndex]);
+      selectItem: async function () {
+        await wait();
         refresh(appStore);
       },
 

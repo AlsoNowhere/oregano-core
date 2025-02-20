@@ -1,6 +1,8 @@
-import { component, mFor, MintScope, node, Resolver } from "mint";
+import { component, mFor, MintScope, node } from "mint";
 
 import { Button } from "thyme";
+
+import { actionStore } from "../../../stores/actions.store";
 
 import { ActionButton } from "../../../models/ActionButton.model";
 
@@ -8,16 +10,13 @@ import { actionButtons } from "../../../data/action-buttons.data";
 
 class ActionsComponent extends MintScope {
   actionButtons: Array<ActionButton>;
-  getTheme: Resolver<string>;
 
   constructor() {
     super();
 
     this.actionButtons = actionButtons;
 
-    this.getTheme = new Resolver(function () {
-      return this.active ? "blueberry" : "snow";
-    });
+    actionStore.connect(this);
   }
 }
 
