@@ -14,9 +14,9 @@ export const actionButtons = [
   ),
   new ActionButton(
     { icon: "sort-numeric-asc", title: "List add order", id: "list-order" },
-    new Action(ActionTypes["add-to-list"], (currentItem, newItem) =>
-      currentItem.items.unshift(newItem)
-    )
+    new Action(ActionTypes["add-to-list"], (currentItem, newItem) => {
+      currentItem.items.unshift(newItem);
+    })
   ),
   new ActionButton(
     {

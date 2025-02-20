@@ -2,21 +2,22 @@ import { MintComponent, Resolver, Store, refresh } from "mint";
 
 import { path, wait } from "sage";
 
-import { getItem } from "../services/get-item.service";
-
-import { saveData } from "../logic/load-save.logic";
-
-import { Item } from "../models/Item.model";
-
-import { IData } from "../interfaces/IData.interface";
-
-import { getTextColour } from "../logic/list-items/get-text-colour.logic";
-import { appStore } from "./app.store";
 import { HasMessage } from "../components/list-items/HasMessage.component";
 import { ItemCount } from "../components/list-items/ItemCount.component";
 import { EditListItem } from "../components/list-items/EditListItem.component";
 import { CutListItem } from "../components/list-items/CutListItem.component";
 import { DeleteListItem } from "../components/list-items/DeleteListItem.component";
+
+import { getItem } from "../services/get-item.service";
+
+import { saveData } from "../logic/load-save.logic";
+import { getTextColour } from "../logic/list-items/get-text-colour.logic";
+
+import { appStore } from "./app.store";
+
+import { Item } from "../models/Item.model";
+
+import { IData } from "../interfaces/IData.interface";
 
 class ListStore extends Store {
   breadcrumbs: boolean;
@@ -64,7 +65,7 @@ class ListStore extends Store {
 
       messageClass: new Resolver(() =>
         listStore.item.actions?.includes("message-to-side")
-          ? "grid-6 padded"
+          ? "grid-6"
           : "grid-12"
       ),
 
