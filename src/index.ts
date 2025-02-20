@@ -1,15 +1,3 @@
-// export { Button } from "./components/Button.component";
-// export { Field, TField } from "./components/field/Field.component";
-// export { Modal, TModal } from "./components/Modal.component";
-
-// export { closeModal } from "./services/close-mdoal.service";
-
-// export { FieldsetOption } from "./models/FieldsetOption.model";
-
-// export { IFieldOption } from "./interfaces/IFieldOption.interface";
-
-// export { TThemes } from "./types/TThemes.type";
-
 export { Header } from "./components/structure/Header.component";
 
 export { Content } from "./components/structure/Content.component";
@@ -25,7 +13,6 @@ export { TreeView } from "./components/pages/TreeView.component";
 export { Search } from "./components/pages/Search.component";
 export { GraphView } from "./components/pages/GraphView.component";
 export { Heatmap } from "./components/pages/Heatmap.component";
-// export { EditHeatmap } from "./components/pages/EditHeatmap.component";
 
 export { MainButtons } from "./components/additions/MainButtons.component";
 export { AddMainButton } from "./components/main-buttons/AddMainButton.component";

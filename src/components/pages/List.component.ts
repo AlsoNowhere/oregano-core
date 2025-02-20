@@ -72,7 +72,7 @@ export const List = component(
                 mIf: mIf("hasList"),
                 mRef: mRef("listElementRef"),
                 class: "list list-page__list",
-                id: "list",
+                id: "list-items",
               },
               node(
                 "li",

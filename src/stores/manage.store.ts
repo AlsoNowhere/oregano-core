@@ -98,7 +98,7 @@ const createItem = () => {
 
   newItem.actions = actionButtons
     .filter(({ active }) => active)
-    .map((x) => x.id);
+    .map(({ id }) => id);
 
   {
     const actions = getActionAbles(newItem.actions, ActionTypes.init);
@@ -113,7 +113,7 @@ const createItem = () => {
     // ** There should only be one action that matches this if any do.
     // ** We don't want several to run.
     const [action] = getActionAbles(
-      newItem.actions,
+      listStore.item.actions,
       ActionTypes["add-to-list"]
     );
     if (action instanceof Function) {
@@ -152,7 +152,7 @@ const editItem = () => {
 
   manageStore.editItem.actions = actionButtons
     .filter(({ active }) => active)
-    .map((x) => x.id);
+    .map(({ id }) => id);
 
   {
     const tags =

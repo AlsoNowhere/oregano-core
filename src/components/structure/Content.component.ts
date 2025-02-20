@@ -5,12 +5,10 @@ import { appStore } from "../../stores/app.store";
 class ContentComponent extends MintScope {
   loaded: Resolver;
 
-
   constructor() {
     super();
 
     this.loaded = new Resolver(() => appStore.loaded);
-
   }
 }
 
