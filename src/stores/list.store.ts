@@ -2,11 +2,11 @@ import { MintComponent, Resolver, Store, refresh } from "mint";
 
 import { path, wait } from "sage";
 
-import { HasMessage } from "../components/list-items/HasMessage.component";
-import { ItemCount } from "../components/list-items/ItemCount.component";
-import { EditListItem } from "../components/list-items/EditListItem.component";
-import { CutListItem } from "../components/list-items/CutListItem.component";
-import { DeleteListItem } from "../components/list-items/DeleteListItem.component";
+import { HasMessage } from "../components/pages/list/list-items/HasMessage.component";
+import { ItemCount } from "../components/pages/list/list-items/ItemCount.component";
+import { EditListItem } from "../components/pages/list/list-items/EditListItem.component";
+import { CutListItem } from "../components/pages/list/list-items/CutListItem.component";
+import { DeleteListItem } from "../components/pages/list/list-items/DeleteListItem.component";
 
 import { getItem } from "../services/get-item.service";
 

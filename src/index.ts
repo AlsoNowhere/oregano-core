@@ -14,27 +14,27 @@ export { Search } from "./components/pages/Search.component";
 export { GraphView } from "./components/pages/GraphView.component";
 export { Heatmap } from "./components/pages/Heatmap.component";
 
-export { MainButtons } from "./components/additions/MainButtons.component";
-export { AddMainButton } from "./components/main-buttons/AddMainButton.component";
-export { EditMainButton } from "./components/main-buttons/EditMainButton.component";
-export { UpLevelMainButton } from "./components/main-buttons/UpLevelMainButton.component";
-export { UpToRootMainButton } from "./components/main-buttons/UpToRootMainButton.component";
-export { PasteMainButton } from "./components/main-buttons/PasteMainButton.component";
-export { SaveMainButton } from "./components/main-buttons/SaveMainButton.component";
+export { PrimaryButtons } from "./components/additions/PrimaryButtons.component";
+export { AddAppButton } from "./components/app-buttons/AddAppButton.component";
+export { EditAppButton } from "./components/app-buttons/EditAppButton.component";
+export { UpLevelAppButton } from "./components/app-buttons/UpLevelAppButton.component";
+export { UpToRootAppButton } from "./components/app-buttons/UpToRootAppButton.component";
+export { PasteAppButton } from "./components/app-buttons/PasteAppButton.component";
+export { SaveAppButton } from "./components/app-buttons/SaveAppButton.component";
 
 export { SecondaryButtons } from "./components/additions/SecondaryButtons.component";
-export { ExportSecondaryButton } from "./components/secondary-buttons/ExportSecondaryButton.component";
-export { ImportSecondaryButton } from "./components/secondary-buttons/ImportSecondaryButton.component";
-export { TreeSecondaryButton } from "./components/secondary-buttons/TreeSecondaryButton.component";
-export { SearchSecondaryButton } from "./components/secondary-buttons/SearchSecondaryButton.component";
-export { GraphSecondaryButton } from "./components/secondary-buttons/GraphSecondaryButton.component";
-export { HeatmapSecondaryButton } from "./components/secondary-buttons/HeatmapSecondaryButton.component";
+export { ExportAppButton } from "./components/app-buttons/ExportAppButton.component";
+export { ImportAppButton } from "./components/app-buttons/ImportAppButton.component";
+export { TreeAppButton } from "./components/app-buttons/TreeAppButton.component";
+export { SearchAppButton } from "./components/app-buttons/SearchAppButton.component";
+export { GraphAppButton } from "./components/app-buttons/GraphAppButton.component";
+export { HeatmapAppButton } from "./components/app-buttons/HeatmapAppButton.component";
 
-export { EditListItem } from "./components/list-items/EditListItem.component";
-export { CutListItem } from "./components/list-items/CutListItem.component";
-export { DeleteListItem } from "./components/list-items/DeleteListItem.component";
-export { ItemCount } from "./components/list-items/ItemCount.component";
-export { HasMessage } from "./components/list-items/HasMessage.component";
+export { EditListItem } from "./components/pages/list/list-items/EditListItem.component";
+export { CutListItem } from "./components/pages/list/list-items/CutListItem.component";
+export { DeleteListItem } from "./components/pages/list/list-items/DeleteListItem.component";
+export { ItemCount } from "./components/pages/list/list-items/ItemCount.component";
+export { HasMessage } from "./components/pages/list/list-items/HasMessage.component";
 
 export { TitleField } from "./components/pages/manage/TitleField.component";
 export { MessageField } from "./components/pages/manage/MessageField.component";
@@ -46,9 +46,9 @@ export { appStore } from "./stores/app.store";
 
 export { allRoutes } from "./defaults/all-routes.default";
 export {
-  allMainButtons,
-  AllMainButtons,
-} from "./defaults/all-main-buttons.default";
+  allPrimaryButtons,
+  AllPrimaryButtons,
+} from "./defaults/all-primary-buttons.default";
 export {
   allSecondaryButtons,
   AllSecondaryButtons,
