@@ -2,7 +2,7 @@ import { MintScope, Resolver, component, node, mFor, mIf, refresh } from "mint";
 
 import { path, toast, wait } from "sage";
 
-import { upLevel } from "../../logic/main-buttons/up-level.logic";
+import { upLevel } from "../../logic/app-buttons/up-level.logic";
 
 import { appStore } from "../../stores/app.store";
 import { listStore } from "../../stores/list.store";

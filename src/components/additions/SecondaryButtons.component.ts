@@ -1,6 +1,6 @@
 import { MintScope, Resolver, component, div, mIf } from "mint";
 
-import { mainButtonsStore } from "../../stores/main-buttons.store";
+import { appButtonsStore } from "../../stores/app-buttons.store";
 
 class SecondaryButtonsComponent extends MintScope {
   isList: Resolver;
@@ -8,7 +8,7 @@ class SecondaryButtonsComponent extends MintScope {
   constructor() {
     super();
 
-    this.isList = new Resolver(() => mainButtonsStore.isList);
+    this.isList = new Resolver(() => appButtonsStore.isList);
   }
 }
 

@@ -1,13 +1,13 @@
 import { wait } from "sage";
 
-import { mainButtonsStore } from "../stores/main-buttons.store";
+import { appButtonsStore } from "../stores/app-buttons.store";
 
 export const setFocusOnFirstMainButton = async () => {
   await wait();
-  const { mainButtonsElement } = mainButtonsStore;
-  if (!mainButtonsElement) return;
+  const { appButtonsElement } = appButtonsStore;
+  if (!appButtonsElement) return;
 
-  const addButton = [...mainButtonsElement.children].find((x) =>
+  const addButton = [...appButtonsElement.children].find((x) =>
     x.classList.contains("main-button--add")
   );
   if (!addButton) return;

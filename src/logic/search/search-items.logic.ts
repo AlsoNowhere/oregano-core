@@ -1,8 +1,6 @@
-import { appStore } from "../../stores/app.store";
+import { listStore } from "../../stores/list.store";
 
 import { Item } from "../../models/Item.model";
-
-import { IData } from "../../interfaces/IData.interface";
 
 interface IOutput {
   title: string;
@@ -22,17 +20,23 @@ const resolveIsOnMessage = (
 };
 
 const getPath = (route: Array<number>) => {
-  const [, path] = route.reduce(
-    ([data, path], b) => {
-      path.push(data.title);
-      data = data.items[b];
-      return [data, path];
-    },
-    [appStore.rootData, []] as [IData, Array<string>]
-  );
-  return path.join(" / ");
+  // ** We start at the current Item we're in.
+  let currentItem: Item = listStore.item;
+
+  // ** We will output a collection of titles that represent the route.
+  const outputPath = [currentItem.title];
+
+  for (let locationIndex of route) {
+    const newItem = currentItem.items[locationIndex];
+    outputPath.push(newItem.title);
+    currentItem = newItem;
+  }
+
+  return outputPath.join(" / ");
 };
 
+// ** Recursive function that looks through each item and its items to match against the
+// ** title or the title AND message.
 export const searchItems = (
   list: Array<Item>,
   value: string,
@@ -40,11 +44,15 @@ export const searchItems = (
   output: Array<IOutput> = [],
   currentRoute: Array<number> = []
 ) => {
-  list.forEach(({ title, message, items }, index) => {
+  for (let [index, { title, message, items }] of list.entries()) {
     const isOnTitle = title.toLowerCase().includes(value.toLowerCase());
     const isOnMessage = resolveIsOnMessage(message, includeMessage, value);
     if (isOnTitle || isOnMessage) {
+      // ** Current route defines the path to get to this item e.g. [0,2,1].
+      // ** Here we extend the currentRoute to get to this item.
       const route = [...currentRoute, index];
+
+      // ** The path is the word representation of the route.
       const path = getPath(route);
       output.push({ title, route, path, isOnTitle });
     }
@@ -54,6 +62,6 @@ export const searchItems = (
         index,
       ]);
     }
-  });
+  }
   return output;
 };

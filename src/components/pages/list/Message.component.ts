@@ -114,7 +114,7 @@ const getTemplate = (message: string, scope: MintScope) => {
       classes.push("margin-top margin-bottom");
     }
 
-    if (x.includes("--")) {
+    if (x.slice(0, 2) === "--") {
       x = x.replace(/--/g, "");
       return node(element, { class: classes.join(" ") }, [
         span({ class: "fa fa-circle font-size-small" }),
