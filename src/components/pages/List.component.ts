@@ -8,6 +8,7 @@ import {
   mRef,
   span,
   mExtend,
+  MintComponent,
 } from "mint";
 
 import { styles } from "sage";
@@ -21,6 +22,10 @@ import { Title } from "./list/Title.component";
 import { listStore } from "../../stores/list.store";
 
 import { dragDrop } from "../../data/drag-drop.data";
+
+export type TList = {
+  itemOptions?: Array<MintComponent>;
+};
 
 class ListComponent extends MintScope {
   constructor() {

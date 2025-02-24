@@ -1,2 +1,8 @@
 import { Item } from "../../models/Item.model";
-export declare const searchItemTags: (items: Array<Item>, _tags: string, output?: Array<Item>) => Item[];
+interface IOutput {
+    title: string;
+    route: Array<number>;
+    path: string;
+}
+export declare const searchItemTags: (list: Array<Item>, value: string, output?: Array<IOutput>, currentRoute?: Array<number>) => IOutput[];
+export {};

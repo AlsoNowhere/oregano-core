@@ -6,9 +6,14 @@ import { styles } from "sage";
 
 import { manageStore } from "../../../stores/manage.store";
 
+export type TMessageField = {
+  height?: number;
+};
+
 class MessageFieldComponent extends MintScope {
   message: Resolver<string | Array<string>>;
   setMessage: Resolver<MintEvent>;
+  height: number;
 
   constructor() {
     super();
@@ -18,6 +23,7 @@ class MessageFieldComponent extends MintScope {
       return message;
     });
     this.setMessage = new Resolver(() => manageStore.setMessage);
+    this.height = 23;
   }
 }
 
@@ -33,7 +39,7 @@ export const MessageField = component(
     labelClass: "relative",
     class: "manage-form__message",
     id: "message-field",
-    fieldStyles: styles({ height: "23rem", resize: "none" }),
+    fieldStyles: styles({ height: "{height}rem" }),
     "[onInput]": "setMessage",
   })
 );

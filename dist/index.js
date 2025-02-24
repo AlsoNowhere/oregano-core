@@ -33,12 +33,17 @@ const Header = component("header", HeaderComponent, { class: "header" }, [
     ]),
 ]);
 
+const oreganoSettings = {
+    sessionStorageKey: "",
+    breadcrumbs: false,
+};
+
 class AppStore extends Store {
     constructor() {
         super({
             rootData: null,
             currentItem: null,
-            sessionStorageKey: null,
+            sessionStorageKey: new Resolver(() => oreganoSettings.sessionStorageKey),
             loaded: false,
             currentTitle: new Resolver(function () {
                 var _a;
@@ -968,7 +973,6 @@ class TabsComponent extends MintScope {
         };
         this.selectTab = function () {
             var _a;
-            console.log("Scope: ", scope);
             scope.currentTab = this._x;
             (_a = scope.onSelectTab) === null || _a === void 0 ? void 0 : _a.call(scope);
             refresh(scope);
@@ -1097,7 +1101,7 @@ const getItem = (url, item = appStore.rootData) => {
 class ListStore extends Store {
     constructor() {
         super({
-            breadcrumbs: true,
+            breadcrumbs: new Resolver(() => oreganoSettings.breadcrumbs),
             dragIndex: null,
             listElementRef: null,
             item: new Resolver(() => {
@@ -1178,6 +1182,7 @@ class MessageFieldComponent extends MintScope {
             return message;
         });
         this.setMessage = new Resolver(() => manageStore.setMessage);
+        this.height = 23;
     }
 }
 const MessageField = component("<>", MessageFieldComponent, null, node(Field, {
@@ -1188,7 +1193,7 @@ const MessageField = component("<>", MessageFieldComponent, null, node(Field, {
     labelClass: "relative",
     class: "manage-form__message",
     id: "message-field",
-    fieldStyles: styles({ height: "23rem", resize: "none" }),
+    fieldStyles: styles({ height: "{height}rem" }),
     "[onInput]": "setMessage",
 }));
 
@@ -2029,25 +2034,24 @@ const Manage = component("section", ManageComponent, null, node("form", {
 }, [
     node("h2", null, "{mainLabel} item"),
     node("div", { class: "flex" }, [
-        "_children",
         node("<>", Object.assign({}, mIf("_children")), "_children"),
         node("<>", Object.assign({}, mIf("!_children")), node(template({ onevery: false }, "defaultChildren"))),
-    ]),
-    node("div", { class: "grid-12" }, [
-        node(Button, {
-            type: "submit",
-            "[theme]": "saveButtonTheme",
-            "[label]": "saveButtonLabel",
-            class: "margin-right padded-small",
-            large: true,
-            "[saveButtonTheme]": "saveButtonTheme",
-        }),
-        node(Button, {
-            theme: "smoke",
-            label: "Cancel",
-            class: "large padded-small",
-            "[onClick]": "cancel",
-        }),
+        node("div", { class: "grid-12" }, [
+            node(Button, {
+                type: "submit",
+                "[theme]": "saveButtonTheme",
+                "[label]": "saveButtonLabel",
+                class: "margin-right padded-small",
+                large: true,
+                "[saveButtonTheme]": "saveButtonTheme",
+            }),
+            node(Button, {
+                theme: "smoke",
+                label: "Cancel",
+                class: "large padded-small",
+                "[onClick]": "cancel",
+            }),
+        ]),
     ]),
 ]));
 
@@ -2284,49 +2288,6 @@ const TreeView = component("section", TreeViewComponent, { class: "other-content
     node(Tree, { "[tree]": "currentList" }),
 ]);
 
-const resolveIsOnMessage = (message, includeMessage, value) => {
-    if (!includeMessage)
-        return false;
-    if (message instanceof Array)
-        return false;
-    return message.toLowerCase().includes(value.toLowerCase());
-};
-const getPath = (route) => {
-    // ** We start at the current Item we're in.
-    let currentItem = listStore.item;
-    // ** We will output a collection of titles that represent the route.
-    const outputPath = [currentItem.title];
-    for (let locationIndex of route) {
-        const newItem = currentItem.items[locationIndex];
-        outputPath.push(newItem.title);
-        currentItem = newItem;
-    }
-    return outputPath.join(" / ");
-};
-// ** Recursive function that looks through each item and its items to match against the
-// ** title or the title AND message.
-const searchItems = (list, value, { includeMessage }, output = [], currentRoute = []) => {
-    for (let [index, { title, message, items }] of list.entries()) {
-        const isOnTitle = title.toLowerCase().includes(value.toLowerCase());
-        const isOnMessage = resolveIsOnMessage(message, includeMessage, value);
-        if (isOnTitle || isOnMessage) {
-            // ** Current route defines the path to get to this item e.g. [0,2,1].
-            // ** Here we extend the currentRoute to get to this item.
-            const route = [...currentRoute, index];
-            // ** The path is the word representation of the route.
-            const path = getPath(route);
-            output.push({ title, route, path, isOnTitle });
-        }
-        if (items instanceof Array) {
-            searchItems(items, value, { includeMessage }, output, [
-                ...currentRoute,
-                index,
-            ]);
-        }
-    }
-    return output;
-};
-
 class SearchByTitleComponent extends MintScope {
     constructor() {
         super();
@@ -2388,21 +2349,75 @@ const SearchByTag = component("div", SearchByTagComponent, { class: "padding" },
     ])),
 ]);
 
-const searchItemTags = (items, _tags, output = []) => {
-    const tags = _tags.split(" ");
-    for (let item of items) {
-        searchItemTags(item.items, _tags, output);
-        if (output.includes(item)) {
-            continue;
+const resolveIsOnMessage = (message, includeMessage, value) => {
+    if (!includeMessage)
+        return false;
+    if (message instanceof Array)
+        return false;
+    return message.toLowerCase().includes(value.toLowerCase());
+};
+const getPath$1 = (route) => {
+    // ** We start at the current Item we're in.
+    let currentItem = listStore.item;
+    // ** We will output a collection of titles that represent the route.
+    const outputPath = [currentItem.title];
+    for (let locationIndex of route) {
+        const newItem = currentItem.items[locationIndex];
+        outputPath.push(newItem.title);
+        currentItem = newItem;
+    }
+    return outputPath.join(" / ");
+};
+// ** Recursive function that looks through each item and its items to match against the
+// ** title or the title AND message.
+const searchItems = (list, value, { includeMessage }, output = [], currentRoute = []) => {
+    for (let [index, { title, message, items }] of list.entries()) {
+        const isOnTitle = title.toLowerCase().includes(value.toLowerCase());
+        const isOnMessage = resolveIsOnMessage(message, includeMessage, value);
+        if (isOnTitle || isOnMessage) {
+            // ** Current route defines the path to get to this item e.g. [0,2,1].
+            // ** Here we extend the currentRoute to get to this item.
+            const route = [...currentRoute, index];
+            // ** The path is the word representation of the route.
+            const path = getPath$1(route);
+            output.push({ title, route, path, isOnTitle });
         }
-        for (let tag of tags) {
-            if (item.tags === undefined) {
-                continue;
-            }
-            if (!!item.tags.find((x) => x.tag === tag)) {
-                output.push(item);
-                break;
-            }
+        if (items instanceof Array) {
+            searchItems(items, value, { includeMessage }, output, [
+                ...currentRoute,
+                index,
+            ]);
+        }
+    }
+    return output;
+};
+
+const getPath = (route) => {
+    // ** We start at the current Item we're in.
+    let currentItem = listStore.item;
+    // ** We will output a collection of titles that represent the route.
+    const outputPath = [currentItem.title];
+    for (let locationIndex of route) {
+        const newItem = currentItem.items[locationIndex];
+        outputPath.push(newItem.title);
+        currentItem = newItem;
+    }
+    return outputPath.join(" / ");
+};
+// ** Recursive function that looks through each item and its items to match against the
+// ** title or the title AND message.
+const searchItemTags = (list, value, output = [], currentRoute = []) => {
+    for (let [index, { title, items, tags = [] }] of list.entries()) {
+        if (!!tags.find(({ tag }) => tag.includes(value))) {
+            // ** Current route defines the path to get to this item e.g. [0,2,1].
+            // ** Here we extend the currentRoute to get to this item.
+            const route = [...currentRoute, index];
+            // ** The path is the word representation of the route.
+            const path = getPath(route);
+            output.push({ title, route, path });
+        }
+        if (items instanceof Array) {
+            searchItemTags(items, value, output, [...currentRoute, index]);
         }
     }
     return output;
@@ -3418,4 +3433,4 @@ const AllSecondaryButtons = component("<>", null, null, [
     node(SecondaryButtons, null, [...allSecondaryButtons]),
 ]);
 
-export { Actions, AddAppButton, AllPrimaryButtons, AllSecondaryButtons, ColourSelector, Content, CutListItem, DeleteListItem, EditAppButton, EditListItem, ExportAppButton, ExportData, GraphAppButton, GraphView, HasMessage, Header, Heatmap, HeatmapAppButton, ImportAppButton, ImportData, ItemCount, List, Manage, MessageField, OreganoAppComponent, Pages, PasteAppButton, PrimaryButtons, SaveAppButton, Search, SearchAppButton, SecondaryButtons, Tags, TitleField, TreeAppButton, TreeView, UpLevelAppButton, UpToRootAppButton, allPrimaryButtons, allRoutes, allSecondaryButtons, appStore };
+export { Actions, AddAppButton, AllPrimaryButtons, AllSecondaryButtons, ColourSelector, Content, CutListItem, DeleteListItem, EditAppButton, EditListItem, ExportAppButton, ExportData, GraphAppButton, GraphView, HasMessage, Header, Heatmap, HeatmapAppButton, ImportAppButton, ImportData, ItemCount, List, Manage, MessageField, OreganoAppComponent, Pages, PasteAppButton, PrimaryButtons, SaveAppButton, Search, SearchAppButton, SecondaryButtons, Tags, TitleField, TreeAppButton, TreeView, UpLevelAppButton, UpToRootAppButton, allPrimaryButtons, allRoutes, allSecondaryButtons, oreganoSettings };

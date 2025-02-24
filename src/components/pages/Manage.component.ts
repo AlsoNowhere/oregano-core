@@ -29,30 +29,28 @@ export const Manage = component(
       node("h2", null, "{mainLabel} item"),
 
       node("div", { class: "flex" }, [
-        "_children",
         node("<>", { ...mIf("_children") }, "_children"),
         node(
           "<>",
           { ...mIf("!_children") },
           node(template({ onevery: false }, "defaultChildren"))
         ),
-      ]),
-
-      node("div", { class: "grid-12" }, [
-        node(Button, {
-          type: "submit",
-          "[theme]": "saveButtonTheme",
-          "[label]": "saveButtonLabel",
-          class: "margin-right padded-small",
-          large: true,
-          "[saveButtonTheme]": "saveButtonTheme",
-        }),
-        node(Button, {
-          theme: "smoke",
-          label: "Cancel",
-          class: "large padded-small",
-          "[onClick]": "cancel",
-        }),
+        node("div", { class: "grid-12" }, [
+          node(Button, {
+            type: "submit",
+            "[theme]": "saveButtonTheme",
+            "[label]": "saveButtonLabel",
+            class: "margin-right padded-small",
+            large: true,
+            "[saveButtonTheme]": "saveButtonTheme",
+          }),
+          node(Button, {
+            theme: "smoke",
+            label: "Cancel",
+            class: "large padded-small",
+            "[onClick]": "cancel",
+          }),
+        ]),
       ]),
     ]
   )
