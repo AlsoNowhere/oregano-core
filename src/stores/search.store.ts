@@ -4,14 +4,15 @@ import { Tab } from "thyme";
 
 import { path, wait } from "sage";
 
-import { getItem } from "../services/get-item.service";
-import { searchItems } from "../logic/search/search-items.logic";
-
 import { SearchByTitle } from "../components/pages/search/SearchByTitle.component";
 import { SearchByTag } from "../components/pages/search/SearchByTag.component";
 
-import { appStore } from "./app.store";
+import { getItem } from "../services/get-item.service";
+
+import { searchItems } from "../logic/search/search-items.logic";
 import { searchItemTags } from "../logic/search/search-item-tags.logic";
+
+import { appStore } from "./app.store";
 
 const tabs = [
   new Tab("By title", () => node(SearchByTitle)),

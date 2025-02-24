@@ -4,6 +4,8 @@ import { Item } from "../models/Item.model";
 
 import { IRootData } from "../interfaces/IRootData.interface";
 
+import { oreganoSettings } from "../data/oregano-settings.data";
+
 class AppStore extends Store {
   rootData: IRootData;
   currentItem: Item | null;
@@ -15,7 +17,7 @@ class AppStore extends Store {
     super({
       rootData: null,
       currentItem: null,
-      sessionStorageKey: null,
+      sessionStorageKey: new Resolver(() => oreganoSettings.sessionStorageKey),
       loaded: false,
 
       currentTitle: new Resolver(function () {

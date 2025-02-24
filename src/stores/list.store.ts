@@ -19,6 +19,8 @@ import { Item } from "../models/Item.model";
 
 import { IData } from "../interfaces/IData.interface";
 
+import { oreganoSettings } from "../data/oregano-settings.data";
+
 class ListStore extends Store {
   breadcrumbs: boolean;
   dragIndex: number | null;
@@ -33,7 +35,7 @@ class ListStore extends Store {
 
   constructor() {
     super({
-      breadcrumbs: true,
+      breadcrumbs: new Resolver(() => oreganoSettings.breadcrumbs),
       dragIndex: null,
 
       listElementRef: null,

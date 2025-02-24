@@ -1,1 +1,5 @@
-export declare const List: import("mint").MintComponent;
+import { MintComponent } from "mint";
+export type TList = {
+    itemOptions?: Array<MintComponent>;
+};
+export declare const List: MintComponent;
