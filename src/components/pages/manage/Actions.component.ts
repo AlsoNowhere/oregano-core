@@ -29,13 +29,14 @@ export const Actions = component(
     {
       mFor: mFor("actionButtons"),
       mKey: "id",
+      class: "margin-right-small",
     },
     node(Button, {
       "[theme]": "getTheme",
       "[icon]": "icon",
       "[label]": "label",
       "[title]": "title",
-      square: true,
+      "[square]": "square",
       "[onClick]": "onClick",
       "[id]": "id",
     })

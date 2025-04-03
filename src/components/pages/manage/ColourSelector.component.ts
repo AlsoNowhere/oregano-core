@@ -21,7 +21,7 @@ class ColourSelectorComponent extends MintScope {
 
     this.radioStyles = new Resolver(function () {
       return styles({
-        "box-shadow": `inset 0 0 2px 2px ${this.value};`,
+        "box-shadow": `inset 0 0 1px 5px ${this.value};`,
       });
     });
   }
