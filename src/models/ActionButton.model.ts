@@ -6,10 +6,11 @@ import { Action } from "./Action.model";
 
 import { actionButtons } from "../data/action-buttons.data";
 
-type options = {
+type TOptions = {
   label?: string;
   icon?: string;
   title: string;
+  square?: boolean;
   id: string;
 };
 
@@ -17,15 +18,17 @@ export class ActionButton {
   label: string;
   icon: string;
   title: string;
+  square: boolean;
   id: string;
   active: boolean;
   action?: Action;
   onClick: MintEvent;
 
-  constructor({ label, icon, title, id }: options, action?) {
+  constructor({ label, icon, title, square = true, id }: TOptions, action?) {
     this.label = label;
     this.icon = icon;
     this.title = title;
+    this.square = square;
     this.action = action;
     this.onClick = function () {
       const buttonScope = this;

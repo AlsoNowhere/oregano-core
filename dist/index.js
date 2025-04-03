@@ -1,4 +1,4 @@
-import { component, node, span, MintScope, Store, Resolver, refresh, mIf, mRef, template, mFor, div, UpwardRef, mExtend } from 'mint';
+import { component, node, span, MintScope, Store, Resolver, refresh, mIf, mRef, template, mFor, mExtend, div, UpwardRef } from 'mint';
 
 const lineProps = {
     y1: "4",
@@ -151,13 +151,18 @@ const timeToWait = 3000;
 
 class Toaster {
     constructor(target = document.body) {
-        this.toast = (message, options) => __awaiter(this, void 0, void 0, function* () {
+        this.toast = (message, options, alternateElementTarget) => __awaiter(this, void 0, void 0, function* () {
             var _a;
+            const _previousTarget = this.target;
+            if (alternateElementTarget !== undefined) {
+                this.target = alternateElementTarget;
+            }
             const theme = typeof options === "string" ? options : (_a = options === null || options === void 0 ? void 0 : options.theme) !== null && _a !== void 0 ? _a : "blueberry";
             const { hasButton, clickToClose, linger, classes, buttonClasses } = typeof options === "string" ? {} : options;
             if (this.toasts.length === 0) {
                 this.mountToastContainer();
             }
+            this.target = _previousTarget;
             const toast = { element: document.createElement("div") };
             toast.element.classList.add("toast", `toast__${theme}`, ...(classes || []));
             const toastMessageSpan = document.createElement("span");
@@ -227,7 +232,7 @@ class Toaster {
     }
 }
 const toaster = new Toaster(document.body);
-const toast = (message, theme = "blueberry") => toaster.toast(message, theme);
+const toast = (message, theme = "blueberry", alternateElementTarget) => toaster.toast(message, theme, alternateElementTarget);
 
 const resolveLeadingZeroes$1 = (item) => {
     if (typeof item === "number") {
@@ -292,10 +297,11 @@ class ActionStore extends Store {
 const actionStore = new ActionStore();
 
 class ActionButton {
-    constructor({ label, icon, title, id }, action) {
+    constructor({ label, icon, title, square = true, id }, action) {
         this.label = label;
         this.icon = icon;
         this.title = title;
+        this.square = square;
         this.action = action;
         this.onClick = function () {
             const buttonScope = this;
@@ -316,34 +322,52 @@ var ActionTypes;
 })(ActionTypes || (ActionTypes = {}));
 
 const actionButtons = [
-    new ActionButton({ icon: "list", title: "Heatmap", id: "heatmap" }, new Action(ActionTypes.init, (item) => {
+    new ActionButton({
+        icon: "clone",
+        label: "M",
+        title: "Message to side",
+        square: false,
+        id: "message-to-side",
+    }),
+    new ActionButton({
+        icon: "sort-numeric-desc",
+        title: "Items added to top",
+        id: "list-order",
+    }, new Action(ActionTypes["add-to-list"], (currentItem, newItem) => {
+        currentItem.items.unshift(newItem);
+    })),
+    // new ActionButton(
+    //   {
+    //     icon: "level-up",
+    //     title: "Large font size",
+    //     id: "large-font",
+    //   },
+    //   new Action(ActionTypes.style, "font-size: 1.5rem;")
+    // ),
+    // new ActionButton(
+    //   {
+    //     label: "B",
+    //     title: "Bold font",
+    //     id: "bold-font",
+    //   },
+    //   new Action(ActionTypes.style, "font-weight: bold;")
+    // ),
+    new ActionButton({
+        icon: "line-chart",
+        title: "Has chart",
+        id: "charts",
+    }),
+    new ActionButton({
+        icon: "list",
+        label: "H",
+        title: "Has heatmap",
+        square: false,
+        id: "heatmap",
+    }, new Action(ActionTypes.init, (item) => {
         if (item.heatmap === undefined) {
             item.heatmap = {};
         }
     })),
-    new ActionButton({ icon: "sort-numeric-asc", title: "List add order", id: "list-order" }, new Action(ActionTypes["add-to-list"], (currentItem, newItem) => {
-        currentItem.items.unshift(newItem);
-    })),
-    new ActionButton({
-        icon: "level-up",
-        title: "Large font size",
-        id: "large-font",
-    }, new Action(ActionTypes.style, "font-size: 1.5rem;")),
-    new ActionButton({
-        label: "B",
-        title: "Bold font",
-        id: "bold-font",
-    }, new Action(ActionTypes.style, "font-weight: bold;")),
-    new ActionButton({
-        icon: "line-chart",
-        title: "Has charts",
-        id: "charts",
-    }),
-    new ActionButton({
-        icon: "clone",
-        title: "Message to side",
-        id: "message-to-side",
-    }),
 ];
 
 const getActionAbles = (actions, match) => {
@@ -558,8 +582,8 @@ class ButtonComponent extends MintScope {
         this.theme = "snow";
         this.class = "";
         this.style = undefined;
+        this.content = undefined;
         this.id = undefined;
-        this.onClick = null;
         this.classes = new Resolver(function () {
             if (this.hasExtraButtonLabel)
                 return `${this.class} multi-content`;
@@ -583,6 +607,10 @@ class ButtonComponent extends MintScope {
         this.getExtraButtonLabel = function () {
             return this.extraButtonLabel;
         };
+        this.getContent = function () {
+            return this.content;
+        };
+        this.onClick = null;
     }
 }
 const Button = component("button", ButtonComponent, {
@@ -594,17 +622,72 @@ const Button = component("button", ButtonComponent, {
     "(click)": "onClick",
     mRef: mRef("ref"),
 }, [
-    node("span", { mIf: mIf("hasIcon"), class: "icon fa fa-{icon}" }),
-    node("span", { mIf: mIf("hasLabel"), class: "label" }, "{label}"),
-    node("span", { mIf: mIf("hasExtraButtonLabel"), class: "extra-content" }, node(template("getExtraButtonLabel"))),
+    node("<>", Object.assign({}, mIf("!_children")), [
+        node("<>", Object.assign({}, mIf("!content")), [
+            node("span", { mIf: mIf("hasIcon"), class: "icon fa fa-{icon}" }),
+            node("span", { mIf: mIf("hasLabel"), class: "label" }, "{label}"),
+            node("span", { mIf: mIf("hasExtraButtonLabel"), class: "extra-content" }, node(template("getExtraButtonLabel"))),
+        ]),
+        node("<>", Object.assign({}, mIf("content")), node(template("getContent"))),
+    ]),
+    node("<>", Object.assign({}, mIf("_children")), "_children"),
+]);
+
+class ColourSelectorComponent$1 extends MintScope {
+    constructor() {
+        super();
+        this.onInput = null;
+        this.colourSelectorScope = this;
+        this.showColours = false;
+        this.colours = [
+            "black",
+            "green",
+            "lightgreen",
+            "blue",
+            "lightblue",
+            "grey",
+            "lightgrey",
+            "#444",
+            "pink",
+            "teal",
+            "aqua",
+            "red",
+            "tomato",
+            "purple",
+        ];
+        this.toggleShowColours = function () {
+            this.colourSelectorScope.showColours =
+                !this.colourSelectorScope.showColours;
+            refresh(this.colourSelectorScope);
+        };
+        this.chooseColour = function () {
+            var _a;
+            (_a = this.onInput) === null || _a === void 0 ? void 0 : _a.call(this, this._x);
+            this.colourSelectorScope.showColours = false;
+            refresh(this.colourSelectorScope);
+        };
+    }
+}
+component("div", ColourSelectorComponent$1, { class: "relative z-index" }, [
+    node(Button, {
+        "[large]": "large",
+        square: true,
+        content: node("span", null, "C"),
+        "[colourSelectorScope]": "colourSelectorScope",
+        "[onClick]": "toggleShowColours",
+    }),
+    node("ul", Object.assign(Object.assign({}, mIf("showColours")), { class: "list flex absolute left-gap", style: "top: 2rem; width: 100px;" }), node("li", Object.assign(Object.assign({}, mFor("colours")), { mKey: "_i", class: "width height snow-border pointer", style: "background-color: {_x};", "(click)": "chooseColour" }))),
 ]);
 
 class FieldInputComponent extends MintScope {
     constructor() {
         super();
         this.type = "text";
-        this.fieldStyles = "";
+        this.style = "";
+        this.onKeyDown = null;
         this.onInput = null;
+        this.onFocus = null;
+        this.onBlur = null;
         this._labelClass = new Resolver(function () {
             return this.labelClass + (this.large ? " large" : "");
         });
@@ -630,12 +713,15 @@ const FieldInput = component("label", FieldInputComponent, { class: "{_labelClas
         "[value]": "value",
         "[checked]": "checked",
         "[class]": "_inputClass",
+        "[style]": "style",
         "[placeholder]": "placeholder",
         "[required]": "required",
         "[readonly]": "readonly",
-        "[style]": "fieldStyles",
         "[id]": "id",
+        "(keydown)": "onKeyDown",
         "(input)": "onInput",
+        "(focus)": "onFocus",
+        "(blur)": "onBlur",
         mRef: mRef("ref"),
     }),
     node("span", { mIf: mIf("hasLabelBeside") }, "{label}"),
@@ -651,7 +737,7 @@ const FieldCheckbox = component("div", null, null, node(FieldInput, {
     "[labelClass]": "labelClass",
     "[class]": "inputClass",
     "[large]": "large",
-    "[fieldStyles]": "fieldStyles",
+    "[style]": "style",
     "[required]": "required",
     "[readonly]": "readonly",
     "[id]": "id",
@@ -669,7 +755,7 @@ const FieldRadio = component("div", null, null, node(FieldInput, {
     "[labelClass]": "labelClass",
     "[labelStyles]": "labelStyles",
     "[class]": "inputClass",
-    "[fieldStyles]": "fieldStyles",
+    "[style]": "style",
     "[required]": "required",
     "[readonly]": "readonly",
     "[onInput]": "onInput",
@@ -679,7 +765,7 @@ const FieldRadio = component("div", null, null, node(FieldInput, {
 class FieldSelectComponent extends MintScope {
     constructor() {
         super();
-        this.fieldStyles = "";
+        this.style = "";
         this.options = [];
         this.onInput = null;
         this.hasLabel = new Resolver(function () {
@@ -693,7 +779,7 @@ const FieldSelect = component("label", FieldSelectComponent, { class: "{labelCla
         "[name]": "name",
         "[value]": "value",
         "[class]": "class",
-        "[style]": "fieldStyles",
+        "[style]": "style",
         "[required]": "required",
         "[readonly]": "readonly",
         "[id]": "id",
@@ -730,7 +816,7 @@ const FieldFieldset = component("fieldset", FieldFieldsetComponent, { "[id]": "i
         "[class]": "class",
         "[labelClass]": "labelClass",
         "[labelStyles]": "labelStyles",
-        "[fieldStyles]": "fieldStyles",
+        "[style]": "style",
         "[checked]": "isChecked",
         "[onInput]": "onInput",
     }))),
@@ -740,13 +826,13 @@ class FieldTextareaComponent extends MintScope {
     constructor() {
         super();
         this.resize = false;
-        this.fieldStyles = "";
+        this.style = "";
         this.onInput = null;
         this.hasLabel = new Resolver(function () {
             return !!this.label;
         });
         this.getStyles = new Resolver(function () {
-            return this.resize ? "" : "resize: none;" + this.fieldStyles;
+            return (this.resize ? "" : "resize: none; ") + this.style;
         });
         this.getReadonly = new Resolver(function () {
             return this.readonly ? "true" : undefined;
@@ -779,12 +865,15 @@ const passProps = {
     "[labelClass]": "labelClass",
     "[labelStyles]": "labelStyles",
     "[class]": "class",
+    "[style]": "style",
     "[large]": "large",
-    "[fieldStyles]": "fieldStyles",
     "[required]": "required",
     "[readonly]": "readonly",
     "[id]": "id",
+    "[onKeyDown]": "onKeyDown",
     "[onInput]": "onInput",
+    "[onFocus]": "onFocus",
+    "[onBlur]": "onBlur",
     "[ref]": "ref",
 };
 class FieldComponent extends MintScope {
@@ -792,8 +881,12 @@ class FieldComponent extends MintScope {
         super();
         this.type = "text";
         this.class = "";
-        this.fieldStyles = undefined;
+        this.style = undefined;
+        this.onKeyDown = null;
         this.onInput = null;
+        this.onFocus = null;
+        this.onBlur = null;
+        this.extend = {};
         this.ref = null;
         this.isInput = new Resolver(function () {
             const inValidTypes = [
@@ -822,13 +915,13 @@ class FieldComponent extends MintScope {
         });
     }
 }
-const Field = component("div", FieldComponent, { "[class]": "wrapperClasses" }, [
-    node(FieldInput, Object.assign({ mIf: mIf("isInput") }, passProps)),
-    node(FieldCheckbox, Object.assign({ mIf: mIf("isCheckbox") }, passProps)),
-    node(FieldRadio, Object.assign({ mIf: mIf("isRadio") }, passProps)),
-    node(FieldFieldset, Object.assign(Object.assign({ mIf: mIf("isFieldSet") }, passProps), { "[options]": "options" })),
-    node(FieldTextarea, Object.assign(Object.assign({ mIf: mIf("isTextarea") }, passProps), { "[resize]": "resize" })),
-    node(FieldSelect, Object.assign(Object.assign({ mIf: mIf("isSelect") }, passProps), { "[options]": "options" })),
+const Field = component("<>", FieldComponent, { "[class]": "wrapperClasses" }, [
+    node(FieldInput, Object.assign({ mIf: mIf("isInput"), mExtend: mExtend("extend") }, passProps)),
+    node(FieldCheckbox, Object.assign({ mIf: mIf("isCheckbox"), mExtend: mExtend("extend") }, passProps)),
+    node(FieldRadio, Object.assign({ mIf: mIf("isRadio"), mExtend: mExtend("extend") }, passProps)),
+    node(FieldFieldset, Object.assign(Object.assign({ mIf: mIf("isFieldSet"), mExtend: mExtend("extend") }, passProps), { "[options]": "options" })),
+    node(FieldTextarea, Object.assign(Object.assign({ mIf: mIf("isTextarea"), mExtend: mExtend("extend") }, passProps), { "[resize]": "resize" })),
+    node(FieldSelect, Object.assign(Object.assign({ mIf: mIf("isSelect"), mExtend: mExtend("extend") }, passProps), { "[options]": "options" })),
 ]);
 
 const modalTime = 500;
@@ -987,6 +1080,18 @@ const Tabs = component("div", TabsComponent, { class: "tabs", mRef: mRef("ref") 
         "(click)": "selectTab",
     }, node("div", null, "{name}"))),
     node("div", { mIf: mIf("tabSelected"), class: "tabs__body" }, node(template({ onevery: true }, "currentTemplate"))),
+]);
+
+class TableComponent extends MintScope {
+    constructor() {
+        super();
+        this.columns = [];
+        this.rows = [];
+    }
+}
+component("table", TableComponent, { class: "table" }, [
+    node("thead", null, node("tr", null, node("th", Object.assign(Object.assign({}, mFor("columns")), { mKey: "id" }), "{title}"))),
+    node("tbody", null, node("tr", Object.assign(Object.assign({}, mFor("rows")), { mKey: "id" }), node("td", Object.assign(Object.assign({}, mFor("columns")), { mKey: "id" }), "{cell}"))),
 ]);
 
 class Tab {
@@ -1205,7 +1310,7 @@ class ColourSelectorComponent extends MintScope {
         this.setColour = manageStore.setColour;
         this.radioStyles = new Resolver(function () {
             return styles({
-                "box-shadow": `inset 0 0 2px 2px ${this.value};`,
+                "box-shadow": `inset 0 0 1px 5px ${this.value};`,
             });
         });
     }
@@ -1303,12 +1408,13 @@ class ActionsComponent extends MintScope {
 const Actions = component("ul", ActionsComponent, { class: "list flex margin-bottom" }, node("li", {
     mFor: mFor("actionButtons"),
     mKey: "id",
+    class: "margin-right-small",
 }, node(Button, {
     "[theme]": "getTheme",
     "[icon]": "icon",
     "[label]": "label",
     "[title]": "title",
-    square: true,
+    "[square]": "square",
     "[onClick]": "onClick",
     "[id]": "id",
 })));
@@ -1583,6 +1689,9 @@ class BreadcrumbsComponent extends MintScope {
             output = crumbs;
             return output;
         });
+        this.isRoot = new Resolver(function () {
+            return this.content === " -- root -- " ? "orange-text" : "";
+        });
         this.goToLink = function () {
             return __awaiter$1(this, void 0, void 0, function* () {
                 yield wait();
@@ -1598,7 +1707,7 @@ const Breadcrumbs = component("ul", BreadcrumbsComponent, { class: "breadcrumbs"
         class: "breadcrumbs__item-link",
         "(click)": "goToLink",
     }, "{content}"),
-    node("span", { mIf: mIf("!isLink") }, "{content}"),
+    node("span", { mIf: mIf("!isLink"), class: "{isRoot}" }, "{content}"),
 ]));
 
 class ItemOptionsComponent extends MintScope {
@@ -1852,48 +1961,52 @@ const getTemplate = (message, scope) => {
     const output = splits.map((x, i) => {
         let element = "p";
         const classes = ["reset-margin"];
+        const _styles = {};
         // ** Order is important below
         // ** Checkbox
         if (x.includes("--c")) {
             return resolveCheckbox(splits, x, i, scope);
         }
         // ** Code
-        if (x.includes("--<>")) {
+        if (x.substring(0, 4) === "--<>") {
             x = x.replace("--<>", "");
             element = "code";
         }
+        // ** Font size
+        if (/--fs[0-9]{2}/g.test(x.substring(0, 6))) {
+            const size = x.substring(4, 6);
+            x = x.replace(/--fs[0-9]{2}/, "");
+            _styles["font-size"] = size + "px";
+        }
         // ** Font Bold
-        if (x.includes("--b")) {
-            x = x.replace(/--b/g, "");
+        if (x.substring(0, 3) === "--b") {
+            x = x.replace("--b", "");
             classes.push("bold");
         }
         // ** Font Underline
-        if (x.includes("--u")) {
-            x = x.replace(/--u/g, "");
+        if (x.substring(0, 3) === "--u") {
+            x = x.replace("--u", "");
             classes.push("underline");
         }
         // ** Font Italic
-        if (x.includes("--i")) {
-            x = x.replace(/--i/g, "");
+        if (x.substring(0, 3) === "--i") {
+            x = x.replace("--i", "");
             classes.push("italic");
         }
         // ** Add gap before and after
-        if (x.includes("--gap")) {
-            x = x.replace(/--gap/g, "");
+        if (x.substring(0, 5) === "--gap") {
+            x = x.replace("--gap", "");
             classes.push("margin-top margin-bottom");
         }
-        if (x.slice(0, 2) === "--") {
-            x = x.replace(/--/g, "");
+        if (x.substring(0, 2) === "--") {
+            x = x.replace("--", "");
             return node(element, { class: classes.join(" ") }, [
-                span({ class: "fa fa-circle font-size-small" }),
+                span({ class: "fa fa-circle list-page__message-bullet" }),
                 span(x),
             ]);
         }
         let content = x;
-        if (content === "") {
-            content = node("br");
-        }
-        return node(element, { class: classes.join(" ") }, content);
+        return node(element, { class: classes.join(" "), style: styles(_styles) }, content);
     });
     return output;
 };

@@ -11,7 +11,7 @@ import {
 
 import { Field, TField } from "thyme";
 
-import { path } from "sage";
+import { path, styles } from "sage";
 
 import { saveData } from "../../../logic/load-save.logic";
 import { checkHeatmapCheckbox } from "../../../logic/heatmap/check-heatmap-checkbox.logic";
@@ -76,6 +76,7 @@ const getTemplate = (message: string, scope: MintScope) => {
     let element = "p";
 
     const classes = ["reset-margin"];
+    const _styles = {};
 
     // ** Order is important below
 
@@ -85,50 +86,57 @@ const getTemplate = (message: string, scope: MintScope) => {
     }
 
     // ** Code
-    if (x.includes("--<>")) {
+    if (x.substring(0, 4) === "--<>") {
       x = x.replace("--<>", "");
       element = "code";
     }
 
+    // ** Font size
+    if (/--fs[0-9]{2}/g.test(x.substring(0, 6))) {
+      const size = x.substring(4, 6);
+      x = x.replace(/--fs[0-9]{2}/, "");
+      _styles["font-size"] = size + "px";
+    }
+
     // ** Font Bold
-    if (x.includes("--b")) {
-      x = x.replace(/--b/g, "");
+    if (x.substring(0, 3) === "--b") {
+      x = x.replace("--b", "");
       classes.push("bold");
     }
 
     // ** Font Underline
-    if (x.includes("--u")) {
-      x = x.replace(/--u/g, "");
+    if (x.substring(0, 3) === "--u") {
+      x = x.replace("--u", "");
       classes.push("underline");
     }
 
     // ** Font Italic
-    if (x.includes("--i")) {
-      x = x.replace(/--i/g, "");
+    if (x.substring(0, 3) === "--i") {
+      x = x.replace("--i", "");
       classes.push("italic");
     }
 
     // ** Add gap before and after
-    if (x.includes("--gap")) {
-      x = x.replace(/--gap/g, "");
+    if (x.substring(0, 5) === "--gap") {
+      x = x.replace("--gap", "");
       classes.push("margin-top margin-bottom");
     }
 
-    if (x.slice(0, 2) === "--") {
-      x = x.replace(/--/g, "");
+    if (x.substring(0, 2) === "--") {
+      x = x.replace("--", "");
       return node(element, { class: classes.join(" ") }, [
-        span({ class: "fa fa-circle font-size-small" }),
+        span({ class: "fa fa-circle list-page__message-bullet" }),
         span(x),
       ]);
     }
 
     let content: string | TMintContent = x;
 
-    if (content === "") {
-      content = node("br");
-    }
-
-    return node(element, { class: classes.join(" ") }, content);
+    return node(
+      element,
+      { class: classes.join(" "), style: styles(_styles) },
+      content
+    );
   });
 
   return output;

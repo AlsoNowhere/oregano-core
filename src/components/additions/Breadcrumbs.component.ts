@@ -22,7 +22,7 @@ type TCrumbs =
 
 class BreadcrumbsComponent extends MintScope {
   crumbs: Resolver<Array<TCrumbs>>;
-
+  isRoot: Resolver<string>;
   goToLink: () => void;
 
   constructor() {
@@ -82,6 +82,10 @@ class BreadcrumbsComponent extends MintScope {
       return output;
     });
 
+    this.isRoot = new Resolver(function () {
+      return this.content === " -- root -- " ? "orange-text" : "";
+    });
+
     this.goToLink = async function () {
       await wait();
       refresh(listStore);
@@ -104,6 +108,6 @@ export const Breadcrumbs = component(
       },
       "{content}"
     ),
-    node("span", { mIf: mIf("!isLink") }, "{content}"),
+    node("span", { mIf: mIf("!isLink"), class: "{isRoot}" }, "{content}"),
   ])
 );
