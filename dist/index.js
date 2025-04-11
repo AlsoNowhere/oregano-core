@@ -2006,6 +2006,12 @@ const getTemplate = (message, scope) => {
             ]);
         }
         let content = x;
+        // ** Here we day that any empty line should be a BR instead of an empty P Element.
+        // ** This is because an empty P does not have any height.
+        // ** We also check if there are more than one lines.
+        // ** This is to stop the situation where there is no message to show but we add a BR, which is not what we want.
+        if (content === "" && splits.length > 1)
+            return node("br");
         return node(element, { class: classes.join(" "), style: styles(_styles) }, content);
     });
     return output;
