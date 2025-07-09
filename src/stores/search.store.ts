@@ -14,10 +14,7 @@ import { searchItemTags } from "../logic/search/search-item-tags.logic";
 
 import { appStore } from "./app.store";
 
-const tabs = [
-  new Tab("By title", () => node(SearchByTitle)),
-  new Tab("By Tag", () => node(SearchByTag)),
-];
+const tabs = [new Tab("By title", () => node(SearchByTitle)), new Tab("By Tag", () => node(SearchByTag))];
 
 const update: MintEvent<HTMLInputElement> = (_, element) => {
   searchStore.value = element.value;
@@ -81,7 +78,7 @@ class SearchStore extends Store {
       tagSearchResults: [],
       formElementRef: null,
       searchRun: false,
-      includeMessage: false,
+      includeMessage: true,
       tabs,
       currentTab: tabs[0],
 
@@ -96,9 +93,7 @@ class SearchStore extends Store {
       }),
 
       showNoTabItemFound: new Resolver(() => {
-        return (
-          searchStore.searchRun && searchStore.tagSearchResults.length === 0
-        );
+        return searchStore.searchRun && searchStore.tagSearchResults.length === 0;
       }),
 
       fromMessageClass: new Resolver(function () {
