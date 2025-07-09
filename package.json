@@ -1,6 +1,6 @@
 {
   "name": "oregano-core",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "description": "",
   "main": "./dist/index.js",
   "scripts": {
@@ -11,7 +11,7 @@
   "author": "",
   "license": "ISC",
   "peerDependencies": {
-    "mint": "file:../../Mint3"
+    "mint": "file:../../Mint"
   },
   "dependencies": {
     "@rollup/plugin-node-resolve": "^13.3.0",

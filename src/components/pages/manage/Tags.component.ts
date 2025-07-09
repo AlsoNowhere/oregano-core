@@ -1,15 +1,4 @@
-import {
-  MintScope,
-  MintEvent,
-  UpwardRef,
-  component,
-  div,
-  node,
-  refresh,
-  span,
-  Resolver,
-  mFor,
-} from "mint";
+import { MintScope, MintEvent, UpwardRef, component, div, node, refresh, span, Resolver, mFor } from "mint";
 
 import { toast } from "sage";
 
@@ -22,7 +11,7 @@ import { Tag } from "../../../models/Tag.model";
 class TagsComponents extends MintScope {
   tags: Resolver<Array<Tag>>;
 
-  setTabsValue: MintEvent<HTMLInputElement>;
+  setTagsValue: MintEvent<HTMLInputElement>;
   addTab: MintEvent<HTMLFormElement>;
   removeTab: () => void;
 
@@ -39,7 +28,7 @@ class TagsComponents extends MintScope {
 
     this.tagsValue = new Resolver(() => manageStore.tagsValue);
 
-    this.setTabsValue = (_, node) => {
+    this.setTagsValue = (_, node) => {
       manageStore.tagsValue = node.value;
     };
 
@@ -74,9 +63,9 @@ export const Tags = component(
   [
     div({ class: "relative" }, [
       node<TField>(Field, {
-        label: "Tabs",
+        label: "Tags",
         "[value]": "tagsValue",
-        "[onInput]": "setTabsValue",
+        "[onInput]": "setTagsValue",
         class: "padding-right-large",
         "[ref]": "tagInputRef",
       }),
@@ -110,8 +99,8 @@ export const Tags = component(
             "[onClick]": "removeTab",
             "[index]": "_i",
           }),
-        ]
-      )
+        ],
+      ),
     ),
-  ]
+  ],
 );
