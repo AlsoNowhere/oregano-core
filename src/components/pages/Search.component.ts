@@ -20,7 +20,7 @@ export const Search = component("<>", SearchComponent, null, [
       "form",
       {
         class: "flex",
-        "(submit)": "runSearch",
+        "(submit)": "runSearchEvent",
         autocomplete: "off",
         mRef: mRef("formElementRef"),
       },
@@ -39,7 +39,7 @@ export const Search = component("<>", SearchComponent, null, [
             class: "square",
           }),
         ]),
-      ]
+      ],
     ),
 
     node<TTabs>(Tabs, {

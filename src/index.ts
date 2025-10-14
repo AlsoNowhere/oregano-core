@@ -29,6 +29,7 @@ export { TreeAppButton } from "./components/app-buttons/TreeAppButton.component"
 export { SearchAppButton } from "./components/app-buttons/SearchAppButton.component";
 export { GraphAppButton } from "./components/app-buttons/GraphAppButton.component";
 export { HeatmapAppButton } from "./components/app-buttons/HeatmapAppButton.component";
+export { ReturnToSearchButton } from "./components/app-buttons/ReturnToSearchButton.component";
 
 export { EditListItem } from "./components/pages/list/list-items/EditListItem.component";
 export { CutListItem } from "./components/pages/list/list-items/CutListItem.component";
@@ -45,14 +46,8 @@ export { Actions } from "./components/pages/manage/Actions.component";
 export { oreganoSettings } from "../src/data/oregano-settings.data";
 
 export { allRoutes } from "./defaults/all-routes.default";
-export {
-  allPrimaryButtons,
-  AllPrimaryButtons,
-} from "./defaults/all-primary-buttons.default";
-export {
-  allSecondaryButtons,
-  AllSecondaryButtons,
-} from "./defaults/all-secondary-buttons.default";
+export { allPrimaryButtons, AllPrimaryButtons } from "./defaults/all-primary-buttons.default";
+export { allSecondaryButtons, AllSecondaryButtons } from "./defaults/all-secondary-buttons.default";
 
 export { TList } from "./components/pages/List.component";
 export { TMessageField } from "./components/pages/manage/MessageField.component";

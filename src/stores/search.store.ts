@@ -20,8 +20,12 @@ const update: MintEvent<HTMLInputElement> = (_, element) => {
   searchStore.value = element.value;
 };
 
-const runSearch: MintEvent = (event) => {
+const runSearchEvent: MintEvent = (event) => {
   event.preventDefault();
+  searchStore.runSearch();
+};
+
+const runSearch = () => {
   const { value } = searchStore;
   if (value === "") {
     searchStore.value = "";
@@ -44,6 +48,7 @@ const runSearch: MintEvent = (event) => {
 };
 
 const selectRoute = function () {
+  appStore.activeSearch = { route: path.get(), query: searchStore.value };
   path.set(["list", ...path.get().slice(1), ...this.route]);
   searchStore.value = "";
   searchStore.results = [];
@@ -67,7 +72,8 @@ class SearchStore extends Store {
   fromMessageClass: Resolver<string>;
 
   update: MintEvent;
-  runSearch: MintEvent;
+  runSearchEvent: MintEvent;
+  runSearch: () => void;
   selectRoute: () => void;
   onCheckIncludeMessage: MintEvent;
 
@@ -101,9 +107,8 @@ class SearchStore extends Store {
       }),
 
       update,
-
+      runSearchEvent,
       runSearch,
-
       selectRoute,
 
       onCheckIncludeMessage(_, element) {
@@ -117,6 +122,11 @@ class SearchStore extends Store {
         searchStore.searchRun = false;
         await wait();
         searchStore.formElementRef?.search?.focus();
+        if (appStore.activeSearch) {
+          searchStore.value = appStore.activeSearch.query;
+          runSearch();
+          appStore.activeSearch = null;
+        }
       },
     });
   }
