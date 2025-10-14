@@ -1,4 +1,4 @@
-import { node, TNode } from "mint";
+import { node, TMintContent } from "mint";
 
 import { List } from "../components/pages/List.component";
 import { Manage } from "../components/pages/Manage.component";
@@ -10,7 +10,7 @@ import { GraphView } from "../components/pages/GraphView.component";
 import { Heatmap } from "../components/pages/Heatmap.component";
 
 // ** Make sure non of these are ids on any elements or the page will scroll there.
-export const allRoutes: Array<[string, TNode]> = [
+export const allRoutes: Array<[string, TMintContent]> = [
   ["list", node(List)],
   ["manage", node(Manage)],
   ["export", node(ExportData)],

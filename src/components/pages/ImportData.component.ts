@@ -14,44 +14,33 @@ class ImportDataComponent extends MintScope {
   }
 }
 
-export const ImportData = component(
-  "div",
-  ImportDataComponent,
-  { class: "common-page" },
-  [
-    node(
-      "div",
-      { class: "other-content" },
-      node("section", { class: "other-content__container" }, [
-        node("h2", { class: "no-margin" }, "Import into - {currentTitle}"),
+export const ImportData = component("section", ImportDataComponent, { class: "other-content__container" }, [
+  node("h2", { class: "no-margin" }, "Import into - {currentTitle}"),
 
-        node(
-          "form",
-          {
-            class: "form",
-            "(submit)": "onSubmit",
-            mRef: mRef("importFormElement"),
-          },
-          [
-            node<TField>(Field, {
-              type: "textarea",
-              name: "importValue",
-              label: "Enter JSON data here",
-              "[value]": "importValue",
-              fieldStyles: styles({
-                height: "12rem",
-              }),
-              "[onInput]": "onInput",
-            }),
-            node(Button, {
-              type: "submit",
-              theme: "apple",
-              class: "button large padded",
-              label: "Import data",
-            }),
-          ]
-        ),
-      ])
-    ),
-  ]
-);
+  node(
+    "form",
+    {
+      class: "form",
+      "(submit)": "onSubmit",
+      mRef: mRef("importFormElement"),
+    },
+    [
+      node<TField>(Field, {
+        type: "textarea",
+        name: "importValue",
+        label: "Enter JSON data here",
+        "[value]": "importValue",
+        style: styles({
+          height: "12rem",
+        }),
+        "[onInput]": "onInput",
+      }),
+      node(Button, {
+        type: "submit",
+        theme: "apple",
+        class: "button large padded",
+        label: "Import data",
+      }),
+    ],
+  ),
+]);

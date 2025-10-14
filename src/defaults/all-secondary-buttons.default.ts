@@ -9,6 +9,7 @@ import { GraphAppButton } from "../components/app-buttons/GraphAppButton.compone
 import { HeatmapAppButton } from "../components/app-buttons/HeatmapAppButton.component";
 import { CutAllAppButton } from "../components/app-buttons/CutAllAppButton.component";
 import { SaveAppButton } from "../components/app-buttons/SaveAppButton.component";
+import { ReturnToSearchButton } from "../components/app-buttons/ReturnToSearchButton.component";
 
 export const allSecondaryButtons = [
   node(ExportAppButton),
@@ -19,6 +20,7 @@ export const allSecondaryButtons = [
   node(HeatmapAppButton),
   node(CutAllAppButton),
   node(SaveAppButton),
+  node(ReturnToSearchButton),
 ];
 
 export const AllSecondaryButtons = component("<>", null, null, [
